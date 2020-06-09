@@ -88,6 +88,4 @@ cdef class Builder():
         data=cython.str,
         built=cython.bint
     )
-    cpdef build_tokenizer(self, str filename)
-
-    cpdef list tokenizer_array(self, list configs)
+    cpdef build_tokenizer(self, str filename=*)

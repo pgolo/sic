@@ -9,7 +9,7 @@ def perf_tokenizer():
             '%s: processed %d entries "%s" in %s seconds' % (
                 x, n, sample_label, str(
                     timeit.timeit(
-                        setup='import %s; tokenizer_builder = %s.Builder(); machine = tokenizer_builder.build_tokenizer(\'./resources/tokenizer.standard.xml\')' % (x[0], x[0]),
+                        setup='import %s; tokenizer_builder = %s.Builder(); machine = tokenizer_builder.build_tokenizer(\'./sic/tokenizer.standard.xml\')' % (x[0], x[0]),
                         stmt='_ = machine.tokenize(\'%s\', \' \', %s)' % (sample_label, x[1]),
                         number=n
                     )

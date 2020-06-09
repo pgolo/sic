@@ -408,26 +408,18 @@ class Builder():
                     ret += '{0}\t{1}\t{2}\n'.format(key, prop, value)
         return (data['name'], ret)
 
-    def build_tokenizer(self, filename):
+    def build_tokenizer(self, filename=None):
         """This function loads configuration, constructs Tokenizer with this configuration,
         and returns this Tokenizer object.
 
         Args:
             str *filename* is XML file defining the configuration of a tokenizer
         """
+        if not filename:
+            filename = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
         (batch_name, data) = self.expose_tokenizer(filename)
         machine = Tokenizer(filename, batch_name)
         built = machine.make_tokenizer(data)
         if not built:
             logging.critical('Could not build tokenizer using "{0}"!'.format(filename))
         return machine
-
-    def tokenizer_array(self, configs):
-        """This function returns list of tuples (Tokenizer tokenizer, str mode),
-        where tokenizer object is built using provided config, and mode is tokenization mode
-        for a given tokenizer object.
-
-        Args:
-            list(tuple(str, int)) *configs* is list of tuples (filename, tokenization_option)
-        """
-        return [(self.build_tokenizer(config[0]), config[1]) for config in configs]

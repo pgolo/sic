@@ -289,12 +289,6 @@ class TestTokenizer(unittest.TestCase):
         ]
         assert self.assert_tokenization('tokenizer_parent_ci.xml', 'test_ci_parent', testcases) == True, 'Something is wrong.'
 
-    def test_create_tokenizer_array(self):
-        tokenizer_builder = tokenizer.Builder()
-        tokenizers = tokenizer_builder.tokenizer_array([('%s/%s' % (self.assets_dir, config_filename), 0) for config_filename in self.tokenizer_filenames])
-        assert len(tokenizers) == len(self.tokenizer_filenames)
-        assert [x[0].filename for x in tokenizers] == ['%s/%s' % (self.assets_dir, config_filename) for config_filename in self.tokenizer_filenames]
-
     def test_tokenizer_multiple_tokens_ci(self):
         testcases = [
             {
@@ -421,6 +415,9 @@ class TestTokenizer(unittest.TestCase):
         pass
 
     def test_tokenizer_map_option_set(self):
+        pass
+
+    def test_tokenizer_default(self):
         pass
 
 if __name__ == '__main__':
