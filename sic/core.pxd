@@ -1,6 +1,6 @@
 import cython
 
-cdef class BaseTokenizer():
+cdef class Tokenizer():
 
     cdef bint debug
     cdef bint verbose

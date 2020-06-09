@@ -1,10 +1,10 @@
 import sys; sys.path.insert(0, '')
 import unittest
-import src.tokenizer as tokenizer # pylint: disable=E0611,F0401
+import sic.core as tokenizer # pylint: disable=E0611,F0401
 
 class TestTokenizer(unittest.TestCase):
 
-    assets_dir = './tests/assets'
+    assets_dir = './test/assets'
     tokenizer_filenames = [
         'tokenizer_basic_ci.xml',
         'tokenizer_basic_cs.xml',
@@ -55,7 +55,7 @@ class TestTokenizer(unittest.TestCase):
         tokenizer_builder = tokenizer.Builder()
         for filename in self.tokenizer_filenames:
             ret = tokenizer_builder.build_tokenizer('%s/%s' % (self.assets_dir, filename))
-            assert type(ret) == tokenizer.BaseTokenizer, 'Expected BaseTokenizer, returned %s' % str(type(ret))
+            assert type(ret) == tokenizer.Tokenizer, 'Expected Tokenizer, returned %s' % str(type(ret))
 
     def test_tokenizer_basic_ci(self):
         testcases = [

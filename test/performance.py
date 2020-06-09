@@ -1,11 +1,10 @@
 import sys; sys.path.insert(0, '')
 import timeit
-import src.tokenizer # pylint: disable=E0611,F0401
 
 def perf_tokenizer():
     n = 10000
     sample_label = 'acetyl(salicyllic)ac¡d,acid==alpha-labelled-base gentamycinnn nf-bkappa'
-    for x in [('src.tokenizer', '0'), ('src.tokenizer', '1'), ('src.tokenizer', '2'), ('dist.tokenizer', '0'), ('dist.tokenizer', '1'), ('dist.tokenizer', '2')]:
+    for x in [('sic.core', '0'), ('sic.core', '1'), ('sic.core', '2'), ('dist.core', '0'), ('dist.core', '1'), ('dist.core', '2')]:
         print(
             '%s: processed %d entries "%s" in %s seconds' % (
                 x, n, sample_label, str(

@@ -2,7 +2,7 @@ import os
 import xml.etree.ElementTree as et
 import logging
 
-class BaseTokenizer():
+class Tokenizer():
     """This class includes functions and methods for tokenizing strings."""
 
     def __init__(self, filename, tokenizer_name='', debug_mode=False, verbose_mode=False):
@@ -332,7 +332,7 @@ class BaseTokenizer():
         return tokenized
 
 class Builder():
-    """This class is the builder for BaseTokenizer."""
+    """This class is the builder for Tokenizer."""
 
     def __init__(self, debug_mode=False, verbose_mode=False):
         self.debug = debug_mode
@@ -392,7 +392,7 @@ class Builder():
     def expose_tokenizer(self, file_xml):
         """This function processes and compiles tokenizer config defined in XML,
         and returns tuple (str name, str rules) where "name" is the name of tokenizer, and "rules" is
-        the complete list of tokenization rules used for building BaseTokenizer object.
+        the complete list of tokenization rules used for building Tokenizer object.
 
         Args:
             str *file_xml* is XML file defining the configuration of a tokenizer
@@ -409,21 +409,21 @@ class Builder():
         return (data['name'], ret)
 
     def build_tokenizer(self, filename):
-        """This function loads configuration, constructs BaseTokenizer with this configuration,
-        and returns this BaseTokenizer object.
+        """This function loads configuration, constructs Tokenizer with this configuration,
+        and returns this Tokenizer object.
 
         Args:
             str *filename* is XML file defining the configuration of a tokenizer
         """
         (batch_name, data) = self.expose_tokenizer(filename)
-        machine = BaseTokenizer(filename, batch_name)
+        machine = Tokenizer(filename, batch_name)
         built = machine.make_tokenizer(data)
         if not built:
             logging.critical('Could not build tokenizer using "{0}"!'.format(filename))
         return machine
 
     def tokenizer_array(self, configs):
-        """This function returns list of tuples (BaseTokenizer tokenizer, str mode),
+        """This function returns list of tuples (Tokenizer tokenizer, str mode),
         where tokenizer object is built using provided config, and mode is tokenization mode
         for a given tokenizer object.
 
