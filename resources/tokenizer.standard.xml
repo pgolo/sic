@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="standard">
+  <import file="tokenizer.western.xml" />
+  <import file="tokenizer.greek.xml" />
+  <setting name="cs" value="0" />
+</tokenizer>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_split_extension">
+  <setting name="cs" value="0" />
+  <split where="lmr" value="aaaa" />
+  <split where="lrm" value="aaab" />
+  <split where="mlr" value="aaac" />
+  <split where="mrl" value="aaad" />
+  <split where="rlm" value="aaae" />
+  <split where="rml" value="aaaf" />
+  <split where="l" value="lll" />
+  <split where="m" value="mmm" />
+  <split where="r" value="rrr" />
+  <split where="lm" value="lm" />
+  <split where="ml" value="ml" />
+  <split where="rm" value="rm" />
+  <split where="mr" value="mr" />
+  <split where="lr" value="lr" />
+  <split where="rl" value="rl" />
+</tokenizer>

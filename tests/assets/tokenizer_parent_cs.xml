@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_cs_parent">
+  <setting name="cs" value="1" />
+  <token to="replaceToPARENT" from="replaceFromPARENT" />
+  <token to="" from="emptyOne" />
+  <split where="m" value="Alpha" />
+  <split where="l" value="Alpha" />
+  <split where="r" value="Alpha" />
+  <split where="m" value="beta" />
+  <split where="l" value="beta" />
+  <split where="r" value="beta" />
+  <character to="a" from="a" />
+  <character to="b" from="B" />
+  <character to="C" from="c" />
+  <character to="D" from="D" />
+  <character to="e" from="¡" />
+</tokenizer>

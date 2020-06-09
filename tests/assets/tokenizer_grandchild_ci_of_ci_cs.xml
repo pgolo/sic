@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_grandchild_ci_of_ci_cs">
+  <import file="tokenizer_ci_child_of_cs_parent.xml" />
+  <setting name="cs" value="0" />
+  <token to="replaceToGCHLD" from="replaceFromGCHLD" />
+  <token to="" from="emptyThree" />
+  <split where="m" value="Epsilon" />
+  <split where="l" value="Epsilon" />
+  <split where="r" value="Epsilon" />
+  <split where="m" value="zeta" />
+  <split where="l" value="zeta" />
+  <split where="r" value="zeta" />
+</tokenizer>
