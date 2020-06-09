@@ -18,5 +18,6 @@ finally:
         packages=['sic'],
         ext_modules=ext_modules,
         license='MIT',
+        package_data={'sic': ['tokenizer.greek.xml', 'tokenizer.standard.xml', 'tokenizer.western.xml']},
         include_package_data=True
     )
