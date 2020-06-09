@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tokenizer name="greek"> <!-- greek letters -->
-  <!-- split words -->
+<tokenizer name="greek">
   <setting name="cs" value="0" />
   <split where="lmr" value="anti" />
   <split where="lmr" value="alpha" />
@@ -27,7 +26,6 @@
   <split where="lmr" value="chi" />
   <split where="lmr" value="psi" />
   <split where="lmr" value="omega" />
-  <!-- split characters -->
   <split where="lmr" value="α" />
   <split where="lmr" value="β" />
   <split where="lmr" value="γ" />
@@ -53,7 +51,6 @@
   <split where="lmr" value="χ" />
   <split where="lmr" value="ψ" />
   <split where="lmr" value="ω" />
-  <!-- replace characters -->
   <character to="alpha" from="α" />
   <character to="beta" from="β" />
   <character to="gamma" from="γ" />
