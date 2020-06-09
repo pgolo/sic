@@ -1,2 +1,2 @@
 # sic
-Library and toolkit for string normalization
+Utility for string normalization
