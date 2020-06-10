@@ -10,7 +10,7 @@ except ModuleNotFoundError:
 finally:
     setup(
         name='sic',
-        version='1.0.0',
+        version='0.9.0',
         description='Utility for string normalization',
         url='https://github.com/pgolo/sic',
         author='Pavel Golovatenko-Abramov',
