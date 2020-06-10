@@ -4,7 +4,7 @@ MYDIR=`pwd`
 ROOT=${MYDIR}/../..
 ENV=.env.36
 TEST=${ROOT}/test
-FILES="ut_tokenizer.py"
+FILES="ut_tokenizer.py performance.py"
 cd ${ROOT}
 for FILE in ${FILES}
 do

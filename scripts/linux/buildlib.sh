@@ -9,7 +9,7 @@ TEST=${ROOT}/test
 cd ${ROOT}
 rm -r ${ROOT}/build
 rm -r ${ROOT}/cythonized
-mkdir -p ${ROOT}/dist
+mkdir -p ${DIST}
 ${ROOT}/${ENV}/bin/python3 ${TEST}/compile.py build_ext --inplace
-mv ${ROOT}/*.so ${ROOT}/dist
+mv ${SRC}/*.so ${DIST}
 cd ${RUNDIR}
