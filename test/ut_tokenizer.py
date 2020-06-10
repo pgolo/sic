@@ -1,10 +1,10 @@
 import sys; sys.path.insert(0, '')
 import unittest
-import src.tokenizer as tokenizer # pylint: disable=E0611,F0401
+import sic.core as tokenizer # pylint: disable=E0611,F0401
 
 class TestTokenizer(unittest.TestCase):
 
-    assets_dir = './tests/assets'
+    assets_dir = './test/assets'
     tokenizer_filenames = [
         'tokenizer_basic_ci.xml',
         'tokenizer_basic_cs.xml',
@@ -55,7 +55,7 @@ class TestTokenizer(unittest.TestCase):
         tokenizer_builder = tokenizer.Builder()
         for filename in self.tokenizer_filenames:
             ret = tokenizer_builder.build_tokenizer('%s/%s' % (self.assets_dir, filename))
-            assert type(ret) == tokenizer.BaseTokenizer, 'Expected BaseTokenizer, returned %s' % str(type(ret))
+            assert type(ret) == tokenizer.Tokenizer, 'Expected Tokenizer, returned %s' % str(type(ret))
 
     def test_tokenizer_basic_ci(self):
         testcases = [
@@ -289,12 +289,6 @@ class TestTokenizer(unittest.TestCase):
         ]
         assert self.assert_tokenization('tokenizer_parent_ci.xml', 'test_ci_parent', testcases) == True, 'Something is wrong.'
 
-    def test_create_tokenizer_array(self):
-        tokenizer_builder = tokenizer.Builder()
-        tokenizers = tokenizer_builder.tokenizer_array([('%s/%s' % (self.assets_dir, config_filename), 0) for config_filename in self.tokenizer_filenames])
-        assert len(tokenizers) == len(self.tokenizer_filenames)
-        assert [x[0].filename for x in tokenizers] == ['%s/%s' % (self.assets_dir, config_filename) for config_filename in self.tokenizer_filenames]
-
     def test_tokenizer_multiple_tokens_ci(self):
         testcases = [
             {
@@ -421,6 +415,9 @@ class TestTokenizer(unittest.TestCase):
         pass
 
     def test_tokenizer_map_option_set(self):
+        pass
+
+    def test_tokenizer_default(self):
         pass
 
 if __name__ == '__main__':

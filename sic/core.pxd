@@ -1,6 +1,6 @@
 import cython
 
-cdef class BaseTokenizer():
+cdef class Tokenizer():
 
     cdef bint debug
     cdef bint verbose
@@ -88,6 +88,4 @@ cdef class Builder():
         data=cython.str,
         built=cython.bint
     )
-    cpdef build_tokenizer(self, str filename)
-
-    cpdef list tokenizer_array(self, list configs)
+    cpdef build_tokenizer(self, str filename=*)
