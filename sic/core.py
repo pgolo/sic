@@ -327,9 +327,8 @@ class Tokenizer():
             tokenized = word_separator.join(sorted(tokenized.split(word_separator)))
         elif tokenizer_option == 2:
             tokenized = word_separator.join(sorted(set(tokenized.split(word_separator))))
-        else:
-            self.tokenizer_result['map'] = f_map
         self.tokenizer_result['tokenized'] = tokenized
+        self.tokenizer_result['map'] = f_map
         return tokenized
 
 class Builder():

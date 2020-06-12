@@ -9,6 +9,6 @@ cd ${ROOT}
 for FILE in ${FILES}
 do
     echo Running ${FILE}
-    ${ROOT}/${ENV}/bin/python3 ${TEST}/${FILE} -b
+    ${ROOT}/${ENV}/bin/python3 ${TEST}/${FILE}
 done
 cd ${RUNDIR}
