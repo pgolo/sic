@@ -1,6 +1,6 @@
 import cython
 
-cdef class Tokenizer():
+cdef class Normalizer():
 
     cdef bint debug
     cdef bint verbose
@@ -8,7 +8,7 @@ cdef class Tokenizer():
     cdef str filename
     cdef str tokenizer_name
     cdef dict data
-    cdef dict tokenizer_result
+    cdef dict normalizer_result
 
     @cython.locals(
         updated = cython.str,
@@ -55,11 +55,11 @@ cdef class Tokenizer():
         on_the_left=cython.bint,
         on_the_right=cython.bint,
         added_separator=cython.bint,
-        tokenized=cython.str,
+        normalized=cython.str,
         i=cython.int,
         x=cython.str
     )
-    cpdef str tokenize(self, str source_string, str word_separator=*, int tokenizer_option=*)
+    cpdef str normalize(self, str source_string, str word_separator=*, int normalizer_option=*)
 
 cdef class Builder():
 
@@ -88,4 +88,4 @@ cdef class Builder():
         data=cython.str,
         built=cython.bint
     )
-    cpdef build_tokenizer(self, str filename=*)
+    cpdef build_normalizer(self, str filename=*)

@@ -2,8 +2,8 @@ import os
 import xml.etree.ElementTree as et
 import logging
 
-class Tokenizer():
-    """This class includes functions and methods for tokenizing strings."""
+class Normalizer():
+    """This class includes functions and methods for normalizing strings."""
 
     def __init__(self, filename, tokenizer_name='', debug_mode=False, verbose_mode=False):
         logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
@@ -16,7 +16,7 @@ class Tokenizer():
             logging.root.setLevel(logging.DEBUG)
         self.filename = filename
         self.tokenizer_name = tokenizer_name
-        self.tokenizer_result = {'original': '', 'tokenized': '', 'map': []}
+        self.normalizer_result = {'original': '', 'normalized': '', 'map': []}
         self.data = dict()
 
     @property
@@ -29,7 +29,7 @@ class Tokenizer():
 
     @property
     def result(self):
-        return self.tokenizer_result
+        return self.normalizer_result
 
     def update_str_with_chmap(self, value, chmap):
         """This function zooms through a string *value*, replaces characters
@@ -134,25 +134,25 @@ class Tokenizer():
             return 2
         return 0
 
-    def tokenize(self, source_string, word_separator=' ', tokenizer_option=0):
+    def normalize(self, source_string, word_separator=' ', normalizer_option=0):
         """This function zooms through the provided string character by character
-        and returns string which is tokenized representation of a given string.
+        and returns string which is normalized representation of a given string.
 
         Args:
-            *source_string* is input string to tokenize
+            *source_string* is input string to normalize
             *word_separator* is word separator to consider (must be single character)
-            *tokenizer_option* is integer either 0 (normal, default), 1 (list), or 2 (set)
+            *normalizer_option* is integer either 0 (normal, default), 1 (list), or 2 (set)
         """
         assert len(word_separator) == 1, 'word_separator must be single character'
         # TODO: review for refactoring
-        self.tokenizer_result = {'original': source_string, 'tokenized': '', 'map': []}
+        self.normalizer_result = {'original': source_string, 'normalized': '', 'map': []}
         if source_string == '':
             return ''
         original_string = source_string
         subtrie = self.data
         if '_settings' in subtrie and 'bypass' in subtrie['_settings'] and subtrie['_settings']['bypass'] == '1':
-            self.tokenizer_result['tokenized'] = original_string
-            self.tokenizer_result['map'] = [i for i in range(len(original_string))]
+            self.normalizer_result['normalized'] = original_string
+            self.normalizer_result['map'] = [i for i in range(len(original_string))]
             return original_string
         if '_settings' not in subtrie or 'cs' not in subtrie['_settings'] or subtrie['_settings']['cs'] != '1':
             original_string = original_string.lower()
@@ -295,10 +295,6 @@ class Tokenizer():
             # now buffer has token to be replaced
             buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
             b_map = [b_map[0] for i in range(len(buffer))]
-            # if len(b_map) == len(buffer):
-            #     b_map[-1] = total_length - 1
-            # else:
-            #     b_map.append(total_length - 1)
             last_buffer = ''
             l_map = []
             # now buffer has replaced token
@@ -323,19 +319,19 @@ class Tokenizer():
         while this_fragment.endswith(word_separator):
             this_fragment = this_fragment[:-len(word_separator)]
             f_map = f_map[:-len(word_separator)]
-        tokenized = this_fragment
-        if tokenizer_option == 1:
-            tokenized = word_separator.join(sorted(tokenized.split(word_separator)))
-        elif tokenizer_option == 2:
-            tokenized = word_separator.join(sorted(set(tokenized.split(word_separator))))
+        normalized = this_fragment
+        if normalizer_option == 1:
+            normalized = word_separator.join(sorted(normalized.split(word_separator)))
+        elif normalizer_option == 2:
+            normalized = word_separator.join(sorted(set(normalized.split(word_separator))))
         elif len(f_map) > 0:
             f_map[-1] = total_length - 1
-            self.tokenizer_result['map'] = f_map
-        self.tokenizer_result['tokenized'] = tokenized
-        return tokenized
+            self.normalizer_result['map'] = f_map
+        self.normalizer_result['normalized'] = normalized
+        return normalized
 
 class Builder():
-    """This class is the builder for Tokenizer."""
+    """This class is the builder for Normalizer."""
 
     def __init__(self, debug_mode=False, verbose_mode=False):
         self.debug = debug_mode
@@ -411,9 +407,9 @@ class Builder():
                     ret += '{0}\t{1}\t{2}\n'.format(key, prop, value)
         return (data['name'], ret)
 
-    def build_tokenizer(self, filename=None):
-        """This function loads configuration, constructs Tokenizer with this configuration,
-        and returns this Tokenizer object.
+    def build_normalizer(self, filename=None):
+        """This function loads configuration, constructs Normalizer with this configuration,
+        and returns this Normalizer object.
 
         Args:
             str *filename* is XML file defining the configuration of a tokenizer
@@ -421,8 +417,8 @@ class Builder():
         if not filename:
             filename = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
         (batch_name, data) = self.expose_tokenizer(filename)
-        machine = Tokenizer(filename, batch_name)
+        machine = Normalizer(filename, batch_name)
         built = machine.make_tokenizer(data)
         if not built:
-            logging.critical('Could not build tokenizer using "{0}"!'.format(filename))
+            logging.critical('Could not build normalizer using "{0}"!'.format(filename))
         return machine
