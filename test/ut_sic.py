@@ -2,7 +2,7 @@ import sys; sys.path.insert(0, '')
 import unittest
 import sic # pylint: disable=E0611,F0401
 
-class TestTokenizer(unittest.TestCase):
+class TestNormalizer(unittest.TestCase):
 
     assets_dir = './test/assets'
     tokenizer_filenames = [
@@ -27,35 +27,35 @@ class TestTokenizer(unittest.TestCase):
         'tokenizer_split_replace.xml'
     ]
 
-    def tokenize(self, config_filename, string):
+    def normalize(self, config_filename, string):
         builder = sic.Builder()
-        worker = builder.build_tokenizer('%s/%s' % (self.assets_dir, config_filename))
+        worker = builder.build_normalizer('%s/%s' % (self.assets_dir, config_filename))
         word_separator = ' '
         options = {0: 'normal', 1: 'list', 2: 'set'}
-        return (worker.name, {options[x]: worker.tokenize(string, word_separator, x) for x in [0, 1, 2]})
+        return (worker.name, {options[x]: worker.normalize(string, word_separator, x) for x in [0, 1, 2]})
 
-    def assert_tokenization(self, tokenizer_filename, tokenizer_name, testcases):
+    def assert_normalization(self, tokenizer_filename, tokenizer_name, testcases):
         for testcase in testcases:
-            name, result = (self.tokenize(tokenizer_filename, testcase['original']))
+            name, result = (self.normalize(tokenizer_filename, testcase['original']))
             assert name == tokenizer_name, 'Unexpected tokenizer name (expected "%s", got "%s" instead).' % (tokenizer_name, name)
             for option in ['normal', 'list', 'set']:
-                assert result[option] == testcase['expected'][option], 'Unexpected tokenization result for %s (option "%s"): "%s" => "%s" (expected "%s").' % (name, option, testcase['original'], result[option], testcase['expected'][option])
+                assert result[option] == testcase['expected'][option], 'Unexpected normalization result for %s (option "%s"): "%s" => "%s" (expected "%s").' % (name, option, testcase['original'], result[option], testcase['expected'][option])
         return True
 
     def assert_map(self, config_filename, testcases):
         for testcase in testcases:
             builder = sic.Builder()
-            worker = builder.build_tokenizer('%s/%s' % (self.assets_dir, config_filename))
-            _ = worker.tokenize(testcase['original'], testcase['word_separator'], testcase['option'])
+            worker = builder.build_normalizer('%s/%s' % (self.assets_dir, config_filename))
+            _ = worker.normalize(testcase['original'], testcase['word_separator'], testcase['option'])
             result = worker.result
             assert result['original'] == testcase['original'], 'Case "%s": Original strings in input and output do not match for %s (word_separator="%s", option="%s": "%s" => "%s" (expected "%s").' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], testcase['original'], result['original'], testcase['original'])
-            assert result['tokenized'] == testcase['tokenized'], 'Case "%s": Unexpected tokenization result for %s (word_separator="%s", option "%s"): "%s" => "%s" (expected "%s").' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], testcase['original'], result['tokenized'], testcase['tokenized'])
+            assert result['normalized'] == testcase['normalized'], 'Case "%s": Unexpected normalization result for %s (word_separator="%s", option "%s"): "%s" => "%s" (expected "%s").' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], testcase['original'], result['normalized'], testcase['normalized'])
             assert len(result['map']) == len(testcase['map']), 'Case "%s": Unexpected map length for %s: expected %d, got %d.' % (testcase['original'], worker.name, len(testcase['map']), len(result['map']))
             if testcase['option'] == 0:
-                assert len(result['map']) == len(result['tokenized']), 'Case "%s": Legth of map does not match length of tokenized string (config %s, expected %d; got tokenized=%d, map=%d instead).' % (testcase['original'], worker.name, len(testcase['map']), len(result['tokenized']), len(result['map']))
+                assert len(result['map']) == len(result['normalized']), 'Case "%s": Legth of map does not match length of normalized string (config %s, expected %d; got normalized=%d, map=%d instead).' % (testcase['original'], worker.name, len(testcase['map']), len(result['normalized']), len(result['map']))
                 for i, j in enumerate(result['map']):
-                    if result['tokenized'][i] != testcase['word_separator']:
-                        assert testcase['map'][i] == j, 'Case "%s": Unexpected map for %s (word_separator="%s", option "%s"): value at index %d is supposed to be %d (got %d instead), unless character at that position is "%s" (got "%s" instead).' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], i, testcase['map'][i], j, testcase['word_separator'], result['tokenized'][i])
+                    if result['normalized'][i] != testcase['word_separator']:
+                        assert testcase['map'][i] == j, 'Case "%s": Unexpected map for %s (word_separator="%s", option "%s"): value at index %d is supposed to be %d (got %d instead), unless character at that position is "%s" (got "%s" instead).' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], i, testcase['map'][i], j, testcase['word_separator'], result['normalized'][i])
         return True
 
     def test_expose_tokenizer(self):
@@ -67,11 +67,11 @@ class TestTokenizer(unittest.TestCase):
             assert type(ret[0]) == str, 'Expected ret[0] to be str, returned %s' % str(type(ret[0]))
             assert type(ret[1]) == str, 'Expected ret[1] to be str, returned %s' % str(type(ret[1]))
 
-    def test_build_tokenizer(self):
+    def test_build_normalizer(self):
         builder = sic.Builder()
         for filename in self.tokenizer_filenames:
-            ret = builder.build_tokenizer('%s/%s' % (self.assets_dir, filename))
-            assert type(ret) == sic.Tokenizer, 'Expected Tokenizer, returned %s' % str(type(ret))
+            ret = builder.build_normalizer('%s/%s' % (self.assets_dir, filename))
+            assert type(ret) == sic.Normalizer, 'Expected Normalizer, returned %s' % str(type(ret))
 
     def test_tokenizer_basic_ci(self):
         testcases = [
@@ -84,7 +84,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_basic_ci.xml', 'tokenizer_basic_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_basic_ci.xml', 'tokenizer_basic_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_basic_cs(self):
         testcases = [
@@ -97,7 +97,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_basic_cs.xml', 'tokenizer_basic_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_basic_cs.xml', 'tokenizer_basic_cs', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_bypass(self):
         testcases = [
@@ -110,7 +110,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_bypass.xml', 'tokenizer_bypass', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_bypass.xml', 'tokenizer_bypass', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_ci_child_of_ci_parent(self):
         testcases = [
@@ -123,7 +123,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_ci_child_of_ci_parent.xml', 'test_ci_child_of_ci_parent', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_ci_child_of_ci_parent.xml', 'test_ci_child_of_ci_parent', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_ci_child_of_cs_parent(self):
         testcases = [
@@ -136,7 +136,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_ci_child_of_cs_parent.xml', 'test_ci_child_of_cs_parent', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_ci_child_of_cs_parent.xml', 'test_ci_child_of_cs_parent', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_cs_child_of_ci_parent(self):
         testcases = [
@@ -149,7 +149,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_ci_child_of_cs_parent.xml', 'test_ci_child_of_cs_parent', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_ci_child_of_cs_parent.xml', 'test_ci_child_of_cs_parent', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_cs_child_of_cs_parent(self):
         testcases = [
@@ -162,7 +162,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_cs_child_of_cs_parent.xml', 'test_cs_child_of_cs_parent', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_cs_child_of_cs_parent.xml', 'test_cs_child_of_cs_parent', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_ci_of_ci_ci(self):
         testcases = [
@@ -175,7 +175,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_ci_of_ci_ci.xml', 'test_grandchild_ci_of_ci_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_ci_of_ci_ci.xml', 'test_grandchild_ci_of_ci_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_ci_of_ci_cs(self):
         testcases = [
@@ -188,7 +188,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_ci_of_ci_cs.xml', 'test_grandchild_ci_of_ci_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_ci_of_ci_cs.xml', 'test_grandchild_ci_of_ci_cs', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_ci_of_cs_ci(self):
         testcases = [
@@ -201,7 +201,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_ci_of_cs_ci.xml', 'test_grandchild_ci_of_cs_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_ci_of_cs_ci.xml', 'test_grandchild_ci_of_cs_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_ci_of_cs_cs(self):
         testcases = [
@@ -214,7 +214,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_ci_of_cs_cs.xml', 'test_grandchild_ci_of_cs_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_ci_of_cs_cs.xml', 'test_grandchild_ci_of_cs_cs', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_cs_of_ci_ci(self):
         testcases = [
@@ -227,7 +227,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_cs_of_ci_ci.xml', 'test_grandchild_cs_of_ci_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_cs_of_ci_ci.xml', 'test_grandchild_cs_of_ci_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_cs_of_ci_cs(self):
         testcases = [
@@ -240,7 +240,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_cs_of_ci_cs.xml', 'test_grandchild_cs_of_ci_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_cs_of_ci_cs.xml', 'test_grandchild_cs_of_ci_cs', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_cs_of_cs_ci(self):
         testcases = [
@@ -253,7 +253,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_cs_of_cs_ci.xml', 'test_grandchild_cs_of_cs_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_cs_of_cs_ci.xml', 'test_grandchild_cs_of_cs_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_grandchild_cs_of_cs_cs(self):
         testcases = [
@@ -266,7 +266,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_grandchild_cs_of_cs_cs.xml', 'test_grandchild_cs_of_cs_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_grandchild_cs_of_cs_cs.xml', 'test_grandchild_cs_of_cs_cs', testcases) == True, 'Something is wrong.'
 
     def test_replace_token_after_split_token_agglutinated(self):
         testcases = [
@@ -303,7 +303,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_parent_ci.xml', 'test_ci_parent', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_parent_ci.xml', 'test_ci_parent', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_multiple_tokens_ci(self):
         testcases = [
@@ -324,7 +324,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_multiple_tokens_ci.xml', 'tokenizer_multiple_tokens_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_multiple_tokens_ci.xml', 'tokenizer_multiple_tokens_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_multiple_tokens_cs(self):
         testcases = [
@@ -345,7 +345,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_multiple_tokens_cs.xml', 'tokenizer_multiple_tokens_cs', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_multiple_tokens_cs.xml', 'tokenizer_multiple_tokens_cs', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_multiple_split_actions_in_one_instruction(self):
         testcases = [
@@ -358,7 +358,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_split_extension.xml', 'test_split_extension', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_split_extension.xml', 'test_split_extension', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_split_replace(self):
         testcases = [
@@ -371,7 +371,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_split_replace.xml', 'test_split_replace', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_split_replace.xml', 'test_split_replace', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_tokens_overlap_ci(self):
         testcases = [
@@ -392,7 +392,7 @@ class TestTokenizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_tokenization('tokenizer_tokens_overlap_ci.xml', 'test_tokens_overlap_ci', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_tokens_overlap_ci.xml', 'test_tokens_overlap_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_bypass(self):
         testcases = [
@@ -400,7 +400,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'This is test for inactive tokenizer.',
-                'tokenized': 'This is test for inactive tokenizer.',
+                'normalized': 'This is test for inactive tokenizer.',
                 'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
             }
         ]
@@ -412,7 +412,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'ABC123def-ghi.',
-                'tokenized': 'abc 123 def - ghi .',
+                'normalized': 'abc 123 def - ghi .',
                 'map': [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 11, 12, 13, 13]
             }
         ]
@@ -424,7 +424,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'abcgammadef',
-                'tokenized': 'abc gamma def',
+                'normalized': 'abc gamma def',
                 'map': [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 8, 9, 10]
             }
         ]
@@ -436,7 +436,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'give me one please',
-                'tokenized': 'give me different words please',
+                'normalized': 'give me different words please',
                 'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11, 12, 13, 14, 15, 16, 17]
             }
         ]
@@ -448,7 +448,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'give me several words please',
-                'tokenized': 'give me word please',
+                'normalized': 'give me word please',
                 'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 21, 22, 23, 24, 25, 26, 27]
             }
         ]
@@ -460,7 +460,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'abc,emptytwo,def',
-                'tokenized': 'abc , , def',
+                'normalized': 'abc , , def',
                 'map': [0, 1, 2, 3, 3, 12, 12, 13, 13, 14, 15]
             }
         ]
@@ -472,7 +472,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'Dr. Emmet is Brown',
-                'tokenized': 'Dr . Emmet is brown',
+                'normalized': 'Dr . Emmet is brown',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
             }
         ]
@@ -485,14 +485,14 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitshort.',
-                'tokenized': 'un split longer .',
+                'normalized': 'un split longer .',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 12, 12]
             },
             {
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitshort',
-                'tokenized': 'un split longer',
+                'normalized': 'un split longer',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 11]
             }
         ]
@@ -504,14 +504,14 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitsuperlong.',
-                'tokenized': 'un split shorter .',
+                'normalized': 'un split shorter .',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 16, 16]
             },
             {
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitsuperlong',
-                'tokenized': 'un split shorter',
+                'normalized': 'un split shorter',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 15]
             }
         ]
@@ -523,14 +523,14 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitnothing.',
-                'tokenized': 'un split .',
+                'normalized': 'un split .',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 14, 14]
             },
             {
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplitnothing',
-                'tokenized': 'un split',
+                'normalized': 'un split',
                 'map': [0, 1, 2, 2, 3, 4, 5, 13]
             }
         ]
@@ -542,14 +542,14 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplity.',
-                'tokenized': 'un split x .',
+                'normalized': 'un split x .',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 8, 8]
             },
             {
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'unsplity',
-                'tokenized': 'un split x',
+                'normalized': 'un split x',
                 'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7]
             }
         ]
@@ -561,7 +561,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 1,
                 'original': 'ABC123def-ghi-jkl.',
-                'tokenized': '- - . 123 abc def ghi jkl',
+                'normalized': '- - . 123 abc def ghi jkl',
                 'map': []
             }
         ]
@@ -573,7 +573,7 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 2,
                 'original': 'ABC123def-ghi-jkl.',
-                'tokenized': '- . 123 abc def ghi jkl',
+                'normalized': '- . 123 abc def ghi jkl',
                 'map': []
             }
         ]
@@ -581,10 +581,10 @@ class TestTokenizer(unittest.TestCase):
 
     def test_tokenizer_default(self):
         builder = sic.Builder()
-        worker = builder.build_tokenizer()
+        worker = builder.build_normalizer()
         testcase = 'Abc123def-ghdeLtai456-jkl'
         expected = 'abc 123 def - gh delta i 456 - jkl'
-        tokenized = worker.tokenize(testcase)
+        tokenized = worker.normalize(testcase)
         assert tokenized == expected, 'Unexpected tokenization result for default config: "%s" => "%s" (expected "%s")' % (testcase, tokenized, expected)
 
     def test_tokenizer_map_nothing(self):
@@ -593,14 +593,14 @@ class TestTokenizer(unittest.TestCase):
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'nothing.',
-                'tokenized': '.',
+                'normalized': '.',
                 'map': [7]
             },
             {
                 'word_separator': ' ',
                 'option': 0,
                 'original': 'nothing',
-                'tokenized': '',
+                'normalized': '',
                 'map': []
             }
         ]

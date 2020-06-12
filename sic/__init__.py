@@ -1,2 +1,2 @@
-from .core import Tokenizer
+from .core import Normalizer
 from .core import Builder
