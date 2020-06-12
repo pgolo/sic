@@ -1,6 +1,6 @@
 import sys; sys.path.insert(0, '')
 import unittest
-import sic.core as tokenizer # pylint: disable=E0611,F0401
+import sic # pylint: disable=E0611,F0401
 
 class TestTokenizer(unittest.TestCase):
 
@@ -28,8 +28,8 @@ class TestTokenizer(unittest.TestCase):
     ]
 
     def tokenize(self, config_filename, string):
-        tokenizer_builder = tokenizer.Builder()
-        worker = tokenizer_builder.build_tokenizer('%s/%s' % (self.assets_dir, config_filename))
+        builder = sic.Builder()
+        worker = builder.build_tokenizer('%s/%s' % (self.assets_dir, config_filename))
         word_separator = ' '
         options = {0: 'normal', 1: 'list', 2: 'set'}
         return (worker.name, {options[x]: worker.tokenize(string, word_separator, x) for x in [0, 1, 2]})
@@ -42,20 +42,36 @@ class TestTokenizer(unittest.TestCase):
                 assert result[option] == testcase['expected'][option], 'Unexpected tokenization result for %s (option "%s"): "%s" => "%s" (expected "%s").' % (name, option, testcase['original'], result[option], testcase['expected'][option])
         return True
 
+    def assert_map(self, config_filename, testcases):
+        for testcase in testcases:
+            builder = sic.Builder()
+            worker = builder.build_tokenizer('%s/%s' % (self.assets_dir, config_filename))
+            _ = worker.tokenize(testcase['original'], testcase['word_separator'], testcase['option'])
+            result = worker.result
+            assert result['original'] == testcase['original'], 'Case "%s": Original strings in input and output do not match for %s (word_separator="%s", option="%s": "%s" => "%s" (expected "%s").' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], testcase['original'], result['original'], testcase['original'])
+            assert result['tokenized'] == testcase['tokenized'], 'Case "%s": Unexpected tokenization result for %s (word_separator="%s", option "%s"): "%s" => "%s" (expected "%s").' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], testcase['original'], result['tokenized'], testcase['tokenized'])
+            assert len(result['map']) == len(testcase['map']), 'Case "%s": Unexpected map length for %s: expected %d, got %d.' % (testcase['original'], worker.name, len(testcase['map']), len(result['map']))
+            if testcase['option'] == 0:
+                assert len(result['map']) == len(result['tokenized']), 'Case "%s": Legth of map does not match length of tokenized string (config %s, expected %d; got tokenized=%d, map=%d instead).' % (testcase['original'], worker.name, len(testcase['map']), len(result['tokenized']), len(result['map']))
+                for i, j in enumerate(result['map']):
+                    if result['tokenized'][i] != testcase['word_separator']:
+                        assert testcase['map'][i] == j, 'Case "%s": Unexpected map for %s (word_separator="%s", option "%s"): value at index %d is supposed to be %d (got %d instead), unless character at that position is "%s" (got "%s" instead).' % (testcase['original'], worker.name, testcase['word_separator'], testcase['option'], i, testcase['map'][i], j, testcase['word_separator'], result['tokenized'][i])
+        return True
+
     def test_expose_tokenizer(self):
-        tokenizer_builder = tokenizer.Builder()
+        builder = sic.Builder()
         for filename in self.tokenizer_filenames:
-            ret = tokenizer_builder.expose_tokenizer('%s/%s' % (self.assets_dir, filename))
+            ret = builder.expose_tokenizer('%s/%s' % (self.assets_dir, filename))
             assert type(ret) == tuple, 'Expected tuple, returned %s' % str(type(ret))
             assert len(ret) == 2, 'Expected length 2, returned %s' % str(len(ret))
             assert type(ret[0]) == str, 'Expected ret[0] to be str, returned %s' % str(type(ret[0]))
             assert type(ret[1]) == str, 'Expected ret[1] to be str, returned %s' % str(type(ret[1]))
 
     def test_build_tokenizer(self):
-        tokenizer_builder = tokenizer.Builder()
+        builder = sic.Builder()
         for filename in self.tokenizer_filenames:
-            ret = tokenizer_builder.build_tokenizer('%s/%s' % (self.assets_dir, filename))
-            assert type(ret) == tokenizer.Tokenizer, 'Expected Tokenizer, returned %s' % str(type(ret))
+            ret = builder.build_tokenizer('%s/%s' % (self.assets_dir, filename))
+            assert type(ret) == sic.Tokenizer, 'Expected Tokenizer, returned %s' % str(type(ret))
 
     def test_tokenizer_basic_ci(self):
         testcases = [
@@ -379,46 +395,197 @@ class TestTokenizer(unittest.TestCase):
         assert self.assert_tokenization('tokenizer_tokens_overlap_ci.xml', 'test_tokens_overlap_ci', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_bypass(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'This is test for inactive tokenizer.',
+                'tokenized': 'This is test for inactive tokenizer.',
+                'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+            }
+        ]
+        assert self.assert_map('tokenizer_bypass.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_only_tokenize(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'ABC123def-ghi.',
+                'tokenized': 'abc 123 def - ghi .',
+                'map': [0, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 11, 12, 13, 13]
+            }
+        ]
+        assert self.assert_map('tokenizer_basic_ci.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_split(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'abcgammadef',
+                'tokenized': 'abc gamma def',
+                'map': [0, 1, 2, 3, 3, 4, 5, 6, 7, 8, 8, 9, 10]
+            }
+        ]
+        assert self.assert_map('tokenizer_ci_child_of_ci_parent.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_replace_to_longer(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'give me one please',
+                'tokenized': 'give me different words please',
+                'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 11, 12, 13, 14, 15, 16, 17]
+            }
+        ]
+        assert self.assert_map('tokenizer_multiple_tokens_ci.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_replace_to_shorter(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'give me several words please',
+                'tokenized': 'give me word please',
+                'map': [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 21, 22, 23, 24, 25, 26, 27]
+            }
+        ]
+        assert self.assert_map('tokenizer_multiple_tokens_ci.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_replace_to_nothing(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'abc,emptytwo,def',
+                'tokenized': 'abc , , def',
+                'map': [0, 1, 2, 3, 3, 12, 12, 13, 13, 14, 15]
+            }
+        ]
+        assert self.assert_map('tokenizer_ci_child_of_ci_parent.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_replace_character(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'Dr. Emmet is Brown',
+                'tokenized': 'Dr . Emmet is brown',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+            }
+        ]
+        assert self.assert_map('tokenizer_parent_cs.xml', testcases) == True, 'Something is wrong.'
+
 
     def test_tokenizer_map_split_replace_to_longer(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitshort.',
+                'tokenized': 'un split longer .',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 12, 12]
+            },
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitshort',
+                'tokenized': 'un split longer',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7]
+            }
+        ]
+        assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_split_replace_to_shorter(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitsuperlong.',
+                'tokenized': 'un split shorter .',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7, 16, 16]
+            },
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitsuperlong',
+                'tokenized': 'un split shorter',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7]
+            }
+        ]
+        assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_split_replace_to_nothing(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitnothing.',
+                'tokenized': 'un split .',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 14, 14]
+            },
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplitnothing',
+                'tokenized': 'un split',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6]
+            }
+        ]
+        assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_split_replace_character(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplity.',
+                'tokenized': 'un split x .',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 8, 8]
+            },
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'unsplity',
+                'tokenized': 'un split x',
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7]
+            }
+        ]
+        assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_option_list(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 1,
+                'original': 'ABC123def-ghi-jkl.',
+                'tokenized': '- - . 123 abc def ghi jkl',
+                'map': []
+            }
+        ]
+        assert self.assert_map('tokenizer_basic_ci.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_map_option_set(self):
-        pass
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 2,
+                'original': 'ABC123def-ghi-jkl.',
+                'tokenized': '- . 123 abc def ghi jkl',
+                'map': []
+            }
+        ]
+        assert self.assert_map('tokenizer_basic_ci.xml', testcases) == True, 'Something is wrong.'
 
     def test_tokenizer_default(self):
-        pass
+        builder = sic.Builder()
+        worker = builder.build_tokenizer()
+        testcase = 'Abc123def-ghdeLtai456-jkl'
+        expected = 'abc 123 def - gh delta i 456 - jkl'
+        tokenized = worker.tokenize(testcase)
+        assert tokenized == expected, 'Unexpected tokenization result for default config: "%s" => "%s" (expected "%s")' % (testcase, tokenized, expected)
 
 if __name__ == '__main__':
     unittest.main()
