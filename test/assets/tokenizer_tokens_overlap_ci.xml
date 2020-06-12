@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_tokens_overlap_ci">
+  <setting name="cs" value="0" />
+  <token to="defaults" from="default" />
+  <token to="word" from="several words" />
+  <split where="lmr" value="alpha" />
+</tokenizer>

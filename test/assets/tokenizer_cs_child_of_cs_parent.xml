@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_cs_child_of_cs_parent">
+  <import file="tokenizer_parent_cs.xml" />
+  <setting name="cs" value="1" />
+  <token to="replaceToCHILD" from="replaceFromCHILD" />
+  <token to="" from="emptyTwo" />
+  <split where="m" value="Gamma" />
+  <split where="l" value="Gamma" />
+  <split where="r" value="Gamma" />
+  <split where="m" value="delta" />
+  <split where="l" value="delta" />
+  <split where="r" value="delta" />
+</tokenizer>

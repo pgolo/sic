@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="tokenizer_bypass">
+  <setting name="bypass" value="1" />
+  <token to="transformed" from="original" />
+</tokenizer>

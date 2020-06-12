@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="tokenizer_multiple_tokens_cs">
+  <setting name="cs" value="1" />
+  <token to="two words" from="three different words" />
+  <token to="word" from="several words" />
+  <token to="different words" from="one" />
+</tokenizer>
