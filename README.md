@@ -42,14 +42,15 @@ pip install sic
 
 ## Tokenization configs
 
-`sic` implements tokenization, i.e. it splits a label into tokens and processes
-those tokens according to the rules specified in a configuration file. Basic
-tokenization includes separating groups of alphabetical, numerical, and
-punctuation characters within a label, thus turning them into separate words
-(for future reference, we'll call such words `tokens`). For instance, `abc-123`
-will be transformed into `abc - 123`, having tokens `abc`, `-`, and `123`.
+`sic` implements tokenization, i.e. it splits a given string into tokens and
+processes those tokens according to the rules specified in a configuration
+file. Basic tokenization includes separating groups of alphabetical, numerical,
+and punctuation characters within a string, thus turning them into separate
+words (for future reference, we'll call such words `tokens`). For instance,
+`abc-123` will be transformed into `abc - 123`, having tokens `abc`, `-`, and
+`123`.
 
-What happens next to initially tokenized label must be defined using XML in
+What happens next to initially tokenized string must be defined using XML in
 configuration file(s). Entry point to default tokenizer applied to a string is
 `sic/tokenizer.standard.xml`.
 
