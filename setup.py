@@ -19,6 +19,8 @@ finally:
         ext_modules=ext_modules,
         package_data={'sic': ['tokenizer.greek.xml', 'tokenizer.standard.xml', 'tokenizer.western.xml']},
         include_package_data=True,
+        license='MIT',
+        platforms=['any'],
         classifiers=[
             'Programming Language :: Python :: 3',
             'License :: OSI Approved :: MIT License',
