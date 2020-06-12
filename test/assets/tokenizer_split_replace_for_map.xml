@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tokenizer name="tokenizer_split_replace">
+<tokenizer name="tokenizer_split_replace_for_map">
   <setting name="cs" value="0" />
   <split where="lmr" value="split" />
   <token to="longer" from="short" />

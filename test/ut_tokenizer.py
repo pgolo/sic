@@ -582,7 +582,7 @@ class TestTokenizer(unittest.TestCase):
     def test_tokenizer_default(self):
         builder = sic.Builder()
         worker = builder.build_tokenizer()
-        testcase = 'ABC123def-ghdeLtai456-jkl'
+        testcase = 'Abc123def-ghdeLtai456-jkl'
         expected = 'abc 123 def - gh delta i 456 - jkl'
         tokenized = worker.tokenize(testcase)
         assert tokenized == expected, 'Unexpected tokenization result for default config: "%s" => "%s" (expected "%s")' % (testcase, tokenized, expected)
