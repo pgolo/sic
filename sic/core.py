@@ -290,14 +290,15 @@ class Tokenizer():
         # check what's in the buffer, and do the right thing
         # DRY!
         on_the_right = True
-        on_the_left = this_fragment[-1:] == word_separator
+        on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
         if '~_' in subtrie and on_the_left and on_the_right:
             # now buffer has token to be replaced
             buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
-            if len(b_map) == len(buffer):
-                b_map[-1] = total_length - 1
-            else:
-                b_map.append(total_length - 1)
+            b_map = [b_map[0] for i in range(len(buffer))]
+            # if len(b_map) == len(buffer):
+            #     b_map[-1] = total_length - 1
+            # else:
+            #     b_map.append(total_length - 1)
             last_buffer = ''
             l_map = []
             # now buffer has replaced token
@@ -327,7 +328,8 @@ class Tokenizer():
             tokenized = word_separator.join(sorted(tokenized.split(word_separator)))
         elif tokenizer_option == 2:
             tokenized = word_separator.join(sorted(set(tokenized.split(word_separator))))
-        else:
+        elif len(f_map) > 0:
+            f_map[-1] = total_length - 1
             self.tokenizer_result['map'] = f_map
         self.tokenizer_result['tokenized'] = tokenized
         return tokenized
