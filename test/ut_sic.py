@@ -493,7 +493,7 @@ class TestTokenizer(unittest.TestCase):
                 'option': 0,
                 'original': 'unsplitshort',
                 'tokenized': 'un split longer',
-                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7]
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 11]
             }
         ]
         assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
@@ -512,7 +512,7 @@ class TestTokenizer(unittest.TestCase):
                 'option': 0,
                 'original': 'unsplitsuperlong',
                 'tokenized': 'un split shorter',
-                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 7]
+                'map': [0, 1, 2, 2, 3, 4, 5, 6, 7, 7, 7, 7, 7, 7, 7, 15]
             }
         ]
         assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
@@ -531,7 +531,7 @@ class TestTokenizer(unittest.TestCase):
                 'option': 0,
                 'original': 'unsplitnothing',
                 'tokenized': 'un split',
-                'map': [0, 1, 2, 2, 3, 4, 5, 6]
+                'map': [0, 1, 2, 2, 3, 4, 5, 13]
             }
         ]
         assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
@@ -586,6 +586,25 @@ class TestTokenizer(unittest.TestCase):
         expected = 'abc 123 def - gh delta i 456 - jkl'
         tokenized = worker.tokenize(testcase)
         assert tokenized == expected, 'Unexpected tokenization result for default config: "%s" => "%s" (expected "%s")' % (testcase, tokenized, expected)
+
+    def test_tokenizer_map_nothing(self):
+        testcases = [
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'nothing.',
+                'tokenized': '.',
+                'map': [7]
+            },
+            {
+                'word_separator': ' ',
+                'option': 0,
+                'original': 'nothing',
+                'tokenized': '',
+                'map': []
+            }
+        ]
+        assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
 if __name__ == '__main__':
     unittest.main()
