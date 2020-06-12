@@ -9,6 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Item 1
-- Item 2
-- Item 3
+- Configurable string normalization module
