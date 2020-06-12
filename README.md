@@ -16,8 +16,8 @@ Basic usage:
 import sic
 
 builder = sic.Builder()
-machine = builder.build_tokenizer()
-x = machine.tokenize('abc123xyzalphabetagammag')
+machine = builder.build_normalizer()
+x = machine.normalize('abc123xyzalphabetagammag')
 print(x)
 ```
 
@@ -42,14 +42,15 @@ pip install sic
 
 ## Tokenization configs
 
-`sic` implements tokenization, i.e. it splits a label into tokens and processes
-those tokens according to the rules specified in a configuration file. Basic
-tokenization includes separating groups of alphabetical, numerical, and
-punctuation characters within a label, thus turning them into separate words
-(for future reference, we'll call such words `tokens`). For instance, `abc-123`
-will be transformed into `abc - 123`, having tokens `abc`, `-`, and `123`.
+`sic` implements tokenization, i.e. it splits a given string into tokens and
+processes those tokens according to the rules specified in a configuration
+file. Basic tokenization includes separating groups of alphabetical, numerical,
+and punctuation characters within a string, thus turning them into separate
+words (for future reference, we'll call such words `tokens`). For instance,
+`abc-123` will be transformed into `abc - 123`, having tokens `abc`, `-`, and
+`123`.
 
-What happens next to initially tokenized label must be defined using XML in
+What happens next to initially tokenized string must be defined using XML in
 configuration file(s). Entry point to default tokenizer applied to a string is
 `sic/tokenizer.standard.xml`.
 
@@ -191,9 +192,10 @@ source code.
 
 ### Class `Builder`
 
-**Function** `Builder.build_tokenizer()` reads tokenization config,
-instantiates `Tokenizer` class that would perform tokenization according to
-rules specified in a given config, and returns this `Tokenizer` class instance.
+**Function** `Builder.build_normalizer()` reads tokenization config,
+instantiates `Normalizer` class that would perform tokenization according to
+rules specified in a given config, and returns this `Normalizer` class
+instance.
 
 | ARGUMENT | TYPE | DEFAULT |              DESCRIPTION              |
 |:--------:|:----:|:-------:|:-------------------------------------:|
@@ -204,32 +206,32 @@ rules specified in a given config, and returns this `Tokenizer` class instance.
 # create Builder object
 builder = sic.Builder()
 
-# create Tokenizer object with default set of rules
-machine = builder.build_tokenizer()
+# create Normalizer object with default set of rules
+machine = builder.build_normalizer()
 
-# create Tokenizer object with custom set of rules
-machine = builder.build_tokenizer('/path/to/config.xml')
+# create Normalizer object with custom set of rules
+machine = builder.build_normalizer('/path/to/config.xml')
 ```
 
-### Class `Tokenizer`
+### Class `Normalizer`
 
-**Function** `Tokenizer.tokenize()` performs string normalization according to
-the rules ingested at the time of class initialization, and returns normalized
-string.
+**Function** `Normalizer.normalize()` performs string normalization according
+to the rules ingested at the time of class initialization, and returns
+normalized string.
 
-|     ARGUMENT     | TYPE | DEFAULT |              DESCRIPTION              |
-|:----------------:|:----:|:-------:|:-------------------------------------:|
-| source_string    | str  |   n/a   | String to normalize.                  |
-| word_separator   | str  |   ' '   | Word delimiter (single character).    |
-| tokenizer_option | int  |    0    | Mode of post-processing.              |
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION             |
+|:-----------------:|:----:|:-------:|:----------------------------------:|
+| source_string     | str  |   n/a   | String to normalize.               |
+| word_separator    | str  |   ' '   | Word delimiter (single character). |
+| normalizer_option | int  |    0    | Mode of post-processing.           |
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 `word_separator`: Specified character will be considered a boundary between
 tokens. The default value is `' '` (space) which seems reasonable choice for
 natural language. However any character can be specified, which might be more
 useful in certain context.
 
-`tokenizer_option`: The value can be either one of `0`, `1`, or `2` and
+`normalizer_option`: The value can be either one of `0`, `1`, or `2` and
 controls the way tokenized string is post-processed:
 
 | VALUE |                             MODE                              |
@@ -239,33 +241,33 @@ controls the way tokenized string is post-processed:
 |   2   | Rearrange tokens in alphabetical order and remove duplicates. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-**Property** `Tokenizer.result` retains the result of last call for
-`Tokenizer.tokenize` function as dict object with the following keys:
+**Property** `Normalizer.result` retains the result of last call for
+`Normalizer.normalize` function as dict object with the following keys:
 
-|     KEY     | VALUE TYPE |                 DESCRIPTION                  |
-|:-----------:|:----------:|:--------------------------------------------:|
-| 'original'  | str        | Original string value that was processed.    |
-| 'tokenized' | str        | Returned normalized string value.            |
-| 'map'       | list(int)  | Map between original and normalized strings. |
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|     KEY      | VALUE TYPE |                 DESCRIPTION                  |
+|:------------:|:----------:|:--------------------------------------------:|
+| 'original'   | str        | Original string value that was processed.    |
+| 'normalized' | str        | Returned normalized string value.            |
+| 'map'        | list(int)  | Map between original and normalized strings. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-`Tokenizer.result['map']`: Not only `Tokenizer.tokenize()` generates normalized
-string out of originally provided, it also tries to map character indexes in
-normalized string back on those in the original one. This map is represented as
-list of integers where item index is character position in normalized string
-and item value is character position in original string. This is only valid
-when `tokenizer_option` argument for `Tokenizer.tokenize()` call has been set
-to 0.
+`Normalizer.result['map']`: Not only `Normalizer.normalize()` generates
+normalized string out of originally provided, it also tries to map character
+indexes in normalized string back on those in the original one. This map is
+represented as list of integers where item index is character position in
+normalized string and item value is character position in original string. This
+is only valid when `normalizer_option` argument for `Normalizer.normalize()`
+call has been set to 0.
 
 ```python
-# using default word_separator and tokenizer_option
-x = machine.tokenize('alpha-2-macroglobulin-p')
+# using default word_separator and normalizer_option
+x = machine.normalize('alpha-2-macroglobulin-p')
 print(x) # 'alpha - 2 - macroglobulin - p'
 print(machine.result)
 """
 {
   'original': 'alpha-2-macroglobulin-p',
-  'tokenized': 'alpha - 2 - macroglobulin - p',
+  'normalized': 'alpha - 2 - macroglobulin - p',
   'map': [
     0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 21, 22, 22
   ]
@@ -273,14 +275,14 @@ print(machine.result)
 """
 
 # using custom word separator
-x = machine.tokenize('alpha-2-macroglobulin-p', word_separator='|')
+x = machine.normalize('alpha-2-macroglobulin-p', word_separator='|')
 print(x) # 'alpha|-|2|-|macroglobulin|-|p'
 
-# using tokenizer_option=1
-x = machine.tokenize('alpha-2-macroglobulin-p', tokenizer_option=1)
+# using normalizer_option=1
+x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=1)
 print(x) # '- - - 2 alpha macroglobulin p'
 
-# using tokenizer_option=2
-x = machine.tokenize('alpha-2-macroglobulin-p', tokenizer_option=1)
+# using normalizer_option=2
+x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=1)
 print(x) # '- 2 alpha macroglobulin p'
 ```
