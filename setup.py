@@ -1,6 +1,8 @@
-from distutils.core import setup
+from setuptools import setup
 
 ext_modules = None
+with open('README.md', mode='r', encoding='utf8') as f:
+    long_description = f.read()
 
 try:
     from Cython.Build import cythonize
@@ -10,14 +12,15 @@ except ModuleNotFoundError:
 finally:
     setup(
         name='sic',
-        version='1.0.1',
+        version='1.0.2',
         description='Utility for string normalization',
+        long_description=long_description,
+        long_description_content_type='text/markdown',
         url='https://github.com/pgolo/sic',
         author='Pavel Golovatenko-Abramov',
         author_email='p.golovatenko@gmail.com',
         packages=['sic'],
         ext_modules=ext_modules,
-        package_data={'sic': ['core.c', 'core.pxd', 'tokenizer.greek.xml', 'tokenizer.standard.xml', 'tokenizer.western.xml']},
         include_package_data=True,
         license='MIT',
         platforms=['any'],

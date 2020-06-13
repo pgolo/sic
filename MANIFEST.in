@@ -1,0 +1,6 @@
+include README.md
+include LICENSE
+include sic/core.c
+include sic/tokenizer.greek.xml
+include sic/tokenizer.standard.xml
+include sic/tokenizer.western.xml
