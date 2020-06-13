@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 ext_modules = None
 with open('README.md', mode='r', encoding='utf8') as f:
@@ -21,7 +21,6 @@ finally:
         author_email='p.golovatenko@gmail.com',
         packages=['sic'],
         ext_modules=ext_modules,
-        package_data={'sic': ['core.c', 'core.pxd', 'tokenizer.greek.xml', 'tokenizer.standard.xml', 'tokenizer.western.xml']},
         include_package_data=True,
         license='MIT',
         platforms=['any'],
