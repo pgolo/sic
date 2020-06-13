@@ -1,6 +1,8 @@
 from distutils.core import setup
 
 ext_modules = None
+with open('README', mode='r', encoding='utf8') as f:
+    long_description = f.read()
 
 try:
     from Cython.Build import cythonize
@@ -10,8 +12,9 @@ except ModuleNotFoundError:
 finally:
     setup(
         name='sic',
-        version='1.0.1',
+        version='1.0.2',
         description='Utility for string normalization',
+        long_description=long_description,
         url='https://github.com/pgolo/sic',
         author='Pavel Golovatenko-Abramov',
         author_email='p.golovatenko@gmail.com',
