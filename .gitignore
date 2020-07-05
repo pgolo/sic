@@ -3,7 +3,7 @@
 build/*
 cythonized/*
 dist/*
-MANIFEST
+*.spec
 sic.egg-info/*
 sic/core.c
 !**/.gitkeep
