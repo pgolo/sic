@@ -3,7 +3,6 @@
 build/*
 cythonized/*
 dist/*
-*.spec
 MANIFEST
 sic.egg-info/*
 sic/core.c
