@@ -1,5 +1,10 @@
 # sic
 
+[![pypi][pypi-img]][pypi-url]
+
+[pypi-img]: https://img.shields.io/pypi/v/sic?style=plastic
+[pypi-url]: https://pypi.org/project/sic/
+
 ###### _(Latin)_ so, thus, such, in such a way, in this way
 ###### _(English)_ spelling is correct
 
