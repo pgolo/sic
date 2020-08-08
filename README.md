@@ -288,6 +288,6 @@ x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=1)
 print(x) # '- - - 2 alpha macroglobulin p'
 
 # using normalizer_option=2
-x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=1)
+x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=2)
 print(x) # '- 2 alpha macroglobulin p'
 ```
