@@ -249,12 +249,13 @@ controls the way tokenized string is post-processed:
 **Property** `Normalizer.result` retains the result of last call for
 `Normalizer.normalize` function as dict object with the following keys:
 
-|     KEY      | VALUE TYPE |                 DESCRIPTION                  |
-|:------------:|:----------:|:--------------------------------------------:|
-| 'original'   | str        | Original string value that was processed.    |
-| 'normalized' | str        | Returned normalized string value.            |
-| 'map'        | list(int)  | Map between original and normalized strings. |
-||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|     KEY      |   VALUE TYPE    |                 DESCRIPTION                          |
+|:------------:|:---------------:|:----------------------------------------------------:|
+| 'original'   | str             | Original string value that was processed.            |
+| 'normalized' | str             | Returned normalized string value.                    |
+| 'map'        | list(int)       | Map between original and normalized strings.         |
+| 'r_map'      | list(list(int)) | Reverse map between original and normalized strings. |
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 `Normalizer.result['map']`: Not only `Normalizer.normalize()` generates
 normalized string out of originally provided, it also tries to map character
@@ -263,6 +264,12 @@ represented as list of integers where item index is character position in
 normalized string and item value is character position in original string. This
 is only valid when `normalizer_option` argument for `Normalizer.normalize()`
 call has been set to 0.
+
+`Normalizer.result['r_map']`: Reverse map between character locations in
+original string and its normalized reflection (item index is character position
+in original string; item value is list [`x`, `y`] where `x` and `y` are
+respectively lowest and highest indexes of mapped characted in normalized
+string.
 
 ```python
 # using default word_separator and normalizer_option
@@ -275,6 +282,9 @@ print(machine.result)
   'normalized': 'alpha - 2 - macroglobulin - p',
   'map': [
     0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 21, 22, 22
+  ],
+  'r_map: [
+    [0, 0], [1, 1], [2, 2], [3, 3], [4, 4], [5, 6], [7, 8], [9, 10], [11, 12], [13, 13], [14, 14], [15, 15], [16, 16], [17, 17], [18, 18], [19, 19], [20, 20], [21, 21], [22, 22], [23, 23], [24, 24], [25, 26], [27, 28]
   ]
 }
 """
