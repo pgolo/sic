@@ -12,7 +12,7 @@ except ModuleNotFoundError:
 finally:
     setup(
         name='sic',
-        version='1.0.4a0',
+        version='1.0.4a1',
         description='Utility for string normalization',
         long_description=long_description,
         long_description_content_type='text/markdown',
