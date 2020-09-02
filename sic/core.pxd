@@ -33,6 +33,14 @@ cdef class Normalizer():
     cdef int chargroup(self, str s)
 
     @cython.locals(
+        ret=cython.list,
+        i=cython.int,
+        j=cython.int,
+        k=cython.int
+    )
+    cdef list reverse_map(self, list m)
+
+    @cython.locals(
         original_string=cython.str,
         subtrie=cython.dict,
         this_fragment=cython.str,
