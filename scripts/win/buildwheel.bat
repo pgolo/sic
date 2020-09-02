@@ -9,12 +9,17 @@ set REQUIREMENTS=%ROOT%\requirements.txt
 set ENV=%ROOT%\.env.build
 
 :BUILD
-if (%1)==() (exit)
+if (%1)==() (cd %RUNDIR% && exit)
 if not exist "%1" (echo "%1": Python not found && shift && goto BUILD)
 cd "%ROOT%"
 virtualenv -p "%1" "%ENV%"
 "%ENV%"\Scripts\python -m pip install --no-cache-dir -r "%REQUIREMENTS%"
 "%ENV%"\Scripts\python "%ROOT%"\setup.py bdist_wheel
 rmdir /S /Q "%ENV%"
+rmdir /S /Q "%ROOT%"\sic.egg-info
+rmdir /S /Q "%ROOT%"\build
+del /Q "%ROOT%"\sic\core.c
 shift
 goto BUILD
+
+cd %RUNDIR%
