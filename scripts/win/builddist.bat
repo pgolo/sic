@@ -14,7 +14,7 @@ if not exist "%1" (echo "%1": Python not found && shift && goto BUILD)
 cd "%ROOT%"
 virtualenv -p "%1" "%ENV%"
 "%ENV%"\Scripts\python -m pip install --no-cache-dir -r "%REQUIREMENTS%"
-"%ENV%"\Scripts\python "%ROOT%"\setup.py bdist_wheel
+"%ENV%"\Scripts\python "%ROOT%"\setup.py sdist bdist_wheel
 rmdir /S /Q "%ENV%"
 shift
 goto BUILD
