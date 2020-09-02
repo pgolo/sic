@@ -6,8 +6,11 @@ with open('README.md', mode='r', encoding='utf8') as f:
     long_description = f.read()
 
 if 'bdist_wheel' in sys.argv:
-    from Cython.Build import cythonize
-    ext_modules = cythonize(['sic/core.py'], compiler_directives={'language_level': '3'})
+    try:
+        from Cython.Build import cythonize
+        ext_modules = cythonize(['sic/core.py'], compiler_directives={'language_level': '3'})
+    except:
+        pass
 
 setup(
     name='sic',
