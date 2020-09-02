@@ -16,7 +16,7 @@ class Normalizer():
             logging.root.setLevel(logging.DEBUG)
         self.filename = filename
         self.tokenizer_name = tokenizer_name
-        self.normalizer_result = {'original': '', 'normalized': '', 'map': []}
+        self.normalizer_result = {'original': '', 'normalized': '', 'map': [], 'r_map': []}
         self.data = dict()
 
     @property
@@ -134,6 +134,28 @@ class Normalizer():
             return 2
         return 0
 
+    def reverse_map(self, m):
+        """This function takes character location map in a form it is stored at self.normalizer_result['map']
+        and returns list where item index is character index in original string, and item value is pair
+        of lowest and highest character index in normalized string.
+        """
+        ret = [None] * (m[-1] + 1)
+        for i in range(len(m)):
+            if ret[m[i]] is None:
+                ret[m[i]] = [i, i]
+            else:
+                ret[m[i]][1] = i
+        for i in range(0, len(ret)):
+            if ret[i] is not None:
+                j = i
+                for k in range(0, j):
+                    ret[k] = ret[j]
+                break
+        for i in range(j+1, len(ret)):
+            if ret[i] is None:
+                ret[i] = ret[i-1]
+        return ret
+
     def normalize(self, source_string, word_separator=' ', normalizer_option=0):
         """This function zooms through the provided string character by character
         and returns string which is normalized representation of a given string.
@@ -145,7 +167,7 @@ class Normalizer():
         """
         assert len(word_separator) == 1, 'word_separator must be single character'
         # TODO: review for refactoring
-        self.normalizer_result = {'original': source_string, 'normalized': '', 'map': []}
+        self.normalizer_result = {'original': source_string, 'normalized': '', 'map': [], 'r_map': []}
         if source_string == '':
             return ''
         original_string = source_string
@@ -153,6 +175,7 @@ class Normalizer():
         if '_settings' in subtrie and 'bypass' in subtrie['_settings'] and subtrie['_settings']['bypass'] == '1':
             self.normalizer_result['normalized'] = original_string
             self.normalizer_result['map'] = [i for i in range(len(original_string))]
+            self.normalizer_result['r_map'] = [(i, i) for i in range(len(original_string))]
             return original_string
         if '_settings' not in subtrie or 'cs' not in subtrie['_settings'] or subtrie['_settings']['cs'] != '1':
             original_string = original_string.lower()
@@ -324,9 +347,10 @@ class Normalizer():
             normalized = word_separator.join(sorted(normalized.split(word_separator)))
         elif normalizer_option == 2:
             normalized = word_separator.join(sorted(set(normalized.split(word_separator))))
-        elif len(f_map) > 0:
+        elif len(f_map) > 0 and normalizer_option == 0:
             f_map[-1] = total_length - 1
             self.normalizer_result['map'] = f_map
+            self.normalizer_result['r_map'] = self.reverse_map(self.normalizer_result['map'])
         self.normalizer_result['normalized'] = normalized
         return normalized
 
