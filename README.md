@@ -40,10 +40,6 @@ pip install sic
 
 - `sic` is designed to work in Python 3 environment.
 - `sic` only needs Python Standard Library (no other packages).
-- Although `sic` leaves very little footprint, it is recommended that in
-  production environment, `Cython` is installed at the time of `sic`
-  installation. Then the module will be cythonized and will work much faster.
-  `Cython` is not required for `sic` to run, once `sic` is installed.
 
 ## Tokenization configs
 
