@@ -1,5 +1,7 @@
 # Usage:
 # buildwheel.sh path/to/python3.6 path/to/python3.7 path/to/python3.8
+#
+# The wheels will be placed in dist/ directory.
 
 RUNDIR=`pwd`
 cd `dirname $0`
