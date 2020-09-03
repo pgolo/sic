@@ -41,6 +41,18 @@ pip install sic
 - `sic` is designed to work in Python 3 environment.
 - `sic` only needs Python Standard Library (no other packages).
 
+**Windows users:** PyPi distribution includes wheels for Python 3.6, 3.7, and
+3.8. The wheels include cythonized module, so no additional steps are required
+to achieve best performance.
+
+**Linux users:** PyPi distribution does not include wheels for Linux, so
+`pip` will install source code package when run under Linux. Installed this
+way, the module will still work, though performance will be subpar. To achieve
+higher speed of processing, it is recommended to clone the repository, build
+the wheel on a local system, and then install it in the environment. See
+`scripts/linux/buildwheel.sh` and the comments there for details.
+
+
 ## Tokenization configs
 
 `sic` implements tokenization, i.e. it splits a given string into tokens and
