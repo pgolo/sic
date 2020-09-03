@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.4a0] - 2020-09-01
+## [Unreleased] - XXXX-XX-XX
 
 ### Added
 
 - Normalizer.result['r_map'] attribute
+- Scripts to build wheels
 
 ## [1.0.3] - 2020-07-30
 
