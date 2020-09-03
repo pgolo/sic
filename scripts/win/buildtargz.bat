@@ -1,6 +1,8 @@
 @echo off
 rem Usage:
 rem buildtargz.bat path\to\python
+rem
+rem The package will be placed in dist\ directory.
 
 set RUNDIR=%cd%
 set MYDIR=%~dp0

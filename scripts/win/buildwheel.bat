@@ -1,6 +1,8 @@
 @echo off
 rem Usage:
 rem buildwheel.bat path\to\python36 path\to\python37 path\to\python38
+rem
+rem The package will be placed in dist\ directory.
 
 set RUNDIR=%cd%
 set MYDIR=%~dp0
