@@ -145,6 +145,7 @@ class Normalizer():
                 ret[m[i]] = [i, i]
             else:
                 ret[m[i]][1] = i
+        j = 0
         for i in range(0, len(ret)):
             if ret[i] is not None:
                 j = i
