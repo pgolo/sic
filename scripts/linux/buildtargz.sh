@@ -1,5 +1,7 @@
 # Usage:
 # buildtargz.sh path/to/python
+#
+# The package will be placed in dist/ directory.
 
 RUNDIR=`pwd`
 cd `dirname $0`
