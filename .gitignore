@@ -3,6 +3,8 @@
 build/*
 cythonized/*
 dist/*
+!dist/*.whl
+!dist/*.tar.gz
 *.spec
 sic.egg-info/*
 sic/core.c
