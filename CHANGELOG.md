@@ -7,11 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - XXXX-XX-XX
 
-### Added
-
-### Deleted
-
 ## Changed
+
+- Normalizer.data is now exposed as a property
 
 ## [1.0.4] - 2020-09-03
 
