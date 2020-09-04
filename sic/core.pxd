@@ -7,7 +7,7 @@ cdef class Normalizer():
     cdef logger
     cdef str filename
     cdef str tokenizer_name
-    cpdef dict data
+    cdef dict content
     cdef dict normalizer_result
 
     @cython.locals(
