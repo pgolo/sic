@@ -3,7 +3,7 @@ set RUNDIR=%cd%
 set ROOT=%~dp0..\..
 set ENV=.env.37
 set SRC=%ROOT%\sic
-set DIST=%ROOT%\dist
+set DIST=%ROOT%\pyd
 set TEST=%ROOT%\test
 cd %ROOT%
 rmdir /S /Q %ROOT%\build
