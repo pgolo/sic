@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Changed
 
 - Normalizer.data is now exposed as a property
+- Updated documentation, added performance benchmarks
 
 ## [1.0.4] - 2020-09-03
 
