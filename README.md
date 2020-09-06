@@ -52,8 +52,8 @@ pip install sic --no-binary sic
 Wheels and .tar.gz can also be downloaded from the project's repository.
 
 Wheels contain binaries compiled from cythonized code. Source code package is
-pure Python. Cythonized version performs better on short strings, while non-
-cythonized version performs better on long strings, so one may be preferred
+pure Python. Cythonized version performs better on short strings, while
+non-cythonized version performs better on long strings, so one may be preferred
 over another depending on usage scenario. The benchmark is below.
 
 | STRING LENGTH | REPEATS | VERSION | MEAN TIME (s) |
