@@ -34,24 +34,35 @@ abc 123 xyz alpha beta gamma g
 
 ## Installation
 
+- `sic` is designed to work in Python 3 environment.
+- `sic` only needs Python Standard Library (no other packages).
+
+To get wheel for Windows (Python >= 3.6) or source code package for Linux:
+
 ```bash
 pip install sic
 ```
 
-- `sic` is designed to work in Python 3 environment.
-- `sic` only needs Python Standard Library (no other packages).
+To get source code package regardless the OS:
 
-**Windows users:** PyPi distribution includes wheels for Python 3.6, 3.7, and
-3.8. The wheels include cythonized module, so no additional steps are required
-to achieve best performance.
+```bash
+pip install sic --no-binary sic
+```
 
-**Linux users:** PyPi distribution does not include wheels for Linux, so
-`pip` will install source code package when run under Linux. Installed this
-way, the module will still work, though performance will be subpar. To achieve
-higher speed of processing, it is recommended to clone the repository, build
-the wheel on a local system, and then install it in the environment. See
-`scripts/linux/buildwheel.sh` and the comments there for details.
+Wheels and .tar.gz can also be downloaded from the project's repository.
 
+Wheels contain binaries compiled from cythonized code. Source code package is
+pure Python. Cythonized version performs better on short strings, while non-
+cythonized version performs better on long strings, so one may be preferred
+over another depending on usage scenario. The benchmark is below.
+
+| STRING LENGTH | REPEATS | VERSION | MEAN TIME (s) |
+|:-------------:|:-------:|:-------:|:-------------:|
+| 71            | 10000   | .tar.gz | 1.4           |
+| 71            | 10000   | wheel   | 0.4           |
+| 710000        | 1       | .tar.gz | 2.2           |
+| 710000        | 1       | wheel   | 14.0          |
+|||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ## Tokenization configs
 
