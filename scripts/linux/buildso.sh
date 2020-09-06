@@ -4,7 +4,7 @@ MYDIR=`pwd`
 ROOT=${MYDIR}/../..
 ENV=.env.36
 SRC=${ROOT}/sic
-DIST=${ROOT}/dist
+DIST=${ROOT}/pyd
 TEST=${ROOT}/test
 cd ${ROOT}
 rm -r ${ROOT}/build
