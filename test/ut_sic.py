@@ -606,7 +606,33 @@ class TestNormalizer(unittest.TestCase):
         ]
         assert self.assert_map('tokenizer_split_replace_for_map.xml', testcases) == True, 'Something is wrong.'
 
-    def test_tokenizer_plurals(self):
+    def test_tokenizer_plurals_left(self):
+        testcases = [
+            {
+                'original': 'plurals plurals',
+                'expected': {
+                    'normal': 'lurals lurals',
+                    'list': 'lurals lurals',
+                    'set': 'lurals'
+                }
+            }
+        ]
+        assert self.assert_normalization('tokenizer_plurals_left.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+
+    def test_tokenizer_plurals_middle(self):
+        testcases = [
+            {
+                'original': 'plurals plurals',
+                'expected': {
+                    'normal': 'plu als plu als',
+                    'list': 'als als plu plu',
+                    'set': 'als plu'
+                }
+            }
+        ]
+        assert self.assert_normalization('tokenizer_plurals_middle.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+
+    def test_tokenizer_plurals_right(self):
         testcases = [
             {
                 'original': 'plurals plurals',
@@ -617,7 +643,21 @@ class TestNormalizer(unittest.TestCase):
                 }
             }
         ]
-        assert self.assert_normalization('tokenizer_plurals.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+        assert self.assert_normalization('tokenizer_plurals_right.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+
+    def test_tokenizer_plurals_all(self):
+        testcases = [
+            {
+                'original': 'plurals plurals',
+                'expected': {
+                    'normal': 'lu al lu al',
+                    'list': 'al al lu lu',
+                    'set': 'al lu'
+                }
+            }
+        ]
+        assert self.assert_normalization('tokenizer_plurals_all.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+
 
 if __name__ == '__main__':
     unittest.main()
