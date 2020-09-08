@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Normalizer.data is now exposed as a property
 - Updated documentation, added performance benchmarks
-- Installable package is either pure Python or wheel with precompiled cython
+- Installable package is either pure Python or wheel with precompiled Cython
 
 ## [1.0.4] - 2020-09-03
 
