@@ -17,7 +17,7 @@ class Normalizer():
         self.filename = filename
         self.tokenizer_name = tokenizer_name
         self.normalizer_result = {'original': '', 'normalized': '', 'map': [], 'r_map': []}
-        self.data = dict()
+        self.content = dict()
 
     @property
     def name(self):
@@ -30,6 +30,14 @@ class Normalizer():
     @property
     def result(self):
         return self.normalizer_result
+
+    @property
+    def data(self):
+        return self.content
+    
+    @data.setter
+    def data(self, obj):
+        self.content = obj
 
     def update_str_with_chmap(self, value, chmap):
         """This function zooms through a string *value*, replaces characters
@@ -118,7 +126,7 @@ class Normalizer():
                         subtrie[actions[action][parameter_keylet]] = parameter_value
                 else:
                     subtrie[actions[action][parameter_key]] = parameter_value
-        self.data = trie
+        self.content = trie
         return True
 
     def chargroup(self, s):
@@ -172,7 +180,7 @@ class Normalizer():
         if source_string == '':
             return ''
         original_string = source_string
-        subtrie = self.data
+        subtrie = self.content
         if '_settings' in subtrie and 'bypass' in subtrie['_settings'] and subtrie['_settings']['bypass'] == '1':
             self.normalizer_result['normalized'] = original_string
             self.normalizer_result['map'] = [i for i in range(len(original_string))]
@@ -201,8 +209,8 @@ class Normalizer():
         added_separator = False
         while current_index < total_length:
             character = original_string[current_index]
-            if character in self.data['_chmap']:
-                character = self.data['_chmap'][character]
+            if character in self.content['_chmap']:
+                character = self.content['_chmap'][character]
             this_group = self.chargroup(character)
             on_the_right = False
             added_separator = False
@@ -217,7 +225,7 @@ class Normalizer():
                     began_reading = False
                     on_the_right = True
                     added_separator = True
-            if not (subtrie is self.data) and character in self.data and temp_index == -1:
+            if not (subtrie is self.content) and character in self.content and temp_index == -1:
                 # mark this as potential head
                 temp_index, temp_buffer, t_map = current_index, buffer, list(b_map)
             if character in subtrie:
@@ -250,7 +258,7 @@ class Normalizer():
                     last_buffer = buffer
                     last_replacement = subtrie['~_']
                     l_map = [b_map[0] for i in range(len(last_replacement))]
-                if '~_' in subtrie and on_the_left and on_the_right:
+                if '~_' in subtrie and ((on_the_left or on_the_right) or '~m' in subtrie):
                     # now buffer has token to be replaced
                     buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
                     b_map = [b_map[0] for i in range(len(buffer))]
@@ -285,7 +293,7 @@ class Normalizer():
                         buffer = word_separator + buffer
                         b_map.insert(0, current_index)
                     temp_index = -1
-                subtrie = self.data
+                subtrie = self.content
                 if temp_index > -1:
                     current_index, buffer, b_map = temp_index, temp_buffer, list(t_map) # plain jumping back which causes performance hit, think about better solution
                     temp_index, temp_buffer, t_map = -1, '', []
@@ -304,10 +312,10 @@ class Normalizer():
                 buffer = character
                 b_map = [current_index for x in character]
                 on_the_left = False
-                if character in self.data:
+                if character in self.content:
                     on_the_left = added_separator or last_character == word_separator
                     began_reading = True
-                    subtrie = self.data[character]
+                    subtrie = self.content[character]
             last_group = this_group
             last_character = character
             current_index += 1
@@ -315,7 +323,7 @@ class Normalizer():
         # DRY!
         on_the_right = True
         on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
-        if '~_' in subtrie and on_the_left and on_the_right:
+        if '~_' in subtrie and ((on_the_left or on_the_right) or '~m' in subtrie):
             # now buffer has token to be replaced
             buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
             b_map = [b_map[0] for i in range(len(buffer))]

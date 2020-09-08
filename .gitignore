@@ -2,6 +2,7 @@
 **/__pycache__/*
 build/*
 cythonized/*
+pyd/*
 dist/*
 !dist/*.whl
 !dist/*.tar.gz

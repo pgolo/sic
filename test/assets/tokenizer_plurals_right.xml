@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="test_plurals">
+  <setting name="cs" value="0" />
+  <split where="r" value="s" />
+  <token to="" from="s" />
+</tokenizer>
