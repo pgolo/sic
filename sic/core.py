@@ -258,7 +258,7 @@ class Normalizer():
                     last_buffer = buffer
                     last_replacement = subtrie['~_']
                     l_map = [b_map[0] for i in range(len(last_replacement))]
-                if '~_' in subtrie and ((on_the_left or on_the_right) or '~m' in subtrie):
+                if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
                     # now buffer has token to be replaced
                     buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
                     b_map = [b_map[0] for i in range(len(buffer))]
@@ -323,7 +323,7 @@ class Normalizer():
         # DRY!
         on_the_right = True
         on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
-        if '~_' in subtrie and ((on_the_left or on_the_right) or '~m' in subtrie):
+        if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
             # now buffer has token to be replaced
             buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
             b_map = [b_map[0] for i in range(len(buffer))]
