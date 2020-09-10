@@ -658,6 +658,19 @@ class TestNormalizer(unittest.TestCase):
         ]
         assert self.assert_normalization('tokenizer_plurals_all.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
 
+    def test_tokenizer_no_plurals_right(self):
+        testcases = [
+            {
+                'original': 'plurals plurals',
+                'expected': {
+                    'normal': 'plurals plurals',
+                    'list': 'plurals plurals',
+                    'set': 'plurals'
+                }
+            }
+        ]
+        assert self.assert_normalization('tokenizer_no_plurals_right.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+
 
 if __name__ == '__main__':
     unittest.main()
