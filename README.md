@@ -184,15 +184,15 @@ Attribute `where` of `<split>` element may have any combination of `l`, `m`, or
 places of a bigger string. So, instead of three different elements
 
 ```xml
-<split where="l" value="word">
-<split where="m" value="word">
-<split where="r" value="word">
+<split where="l" value="word" />
+<split where="m" value="word" />
+<split where="r" value="word" />
 ```
 
 using the following single one
 
 ```xml
-<split where="lmr" value="word">
+<split where="lmr" value="word" />
 ```
 
 will achieve the same result.
