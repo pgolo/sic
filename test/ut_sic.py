@@ -1,6 +1,5 @@
-import sys; sys.path.insert(0, '')
+import sys
 import unittest
-import sic # pylint: disable=E0611,F0401
 
 class TestNormalizer(unittest.TestCase):
 
@@ -673,4 +672,11 @@ class TestNormalizer(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.path.insert(0, '')
+    import sic # pylint: disable=E0611,F0401
+    unittest.main(exit=False)
+    try:
+        import bin as sic # pylint: disable=E0611,F0401
+        unittest.main()
+    except ModuleNotFoundError:
+        print('Could not import module from /bin, test skipped.')

@@ -4,6 +4,7 @@ build/*
 cythonized/*
 pyd/*
 dist/*
+bin/*
 !dist/*.whl
 !dist/*.tar.gz
 *.spec

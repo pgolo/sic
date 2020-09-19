@@ -4,7 +4,7 @@ import timeit
 def perf_normalizer_many_short_strings():
     n = 10000
     sample_label = 'acetyl(salicyllic)ac¡d,acid==alpha-labelled-base gentamycinnn nf-bkappa'
-    for x in [('sic.core', '0'), ('sic.core', '1'), ('sic.core', '2'), ('pyd.core', '0'), ('pyd.core', '1'), ('pyd.core', '2')]:
+    for x in [('sic.core', '0'), ('sic.core', '1'), ('sic.core', '2'), ('bin.core', '0'), ('bin.core', '1'), ('bin.core', '2')]:
         print(
             '%s: processed %d entr%s "%s" in %s seconds' % (
                 x, n, 'y' if n==1 else 'ies', sample_label, str(
@@ -21,7 +21,7 @@ def perf_normalizer_one_long_string():
     n = 1
     sample_label = 'acetyl(salicyllic)ac¡d,acid==alpha-labelled-base gentamycinnn nf-bkappa' * 10000
     sample_label_length = len(sample_label)
-    for x in [('sic.core', '0'), ('sic.core', '1'), ('sic.core', '2'), ('pyd.core', '0'), ('pyd.core', '1'), ('pyd.core', '2')]:
+    for x in [('sic.core', '0'), ('sic.core', '1'), ('sic.core', '2'), ('bin.core', '0'), ('bin.core', '1'), ('bin.core', '2')]:
         print(
             '%s: processed %d entr%s (len=%d) in %s seconds' % (
                 x, n, 'y' if n==1 else 'ies', sample_label_length, str(

@@ -2,19 +2,23 @@ import cython
 
 cdef class Normalizer():
 
-    cdef bint debug
-    cdef bint verbose
-    cdef logger
-    cdef str filename
-    cdef str tokenizer_name
-    cdef dict content
-    cdef dict normalizer_result
+    cdef public bint debug
+    cdef public bint verbose
+    cdef public logger
+    cdef public str filename
+    cdef public str tokenizer_name
+    cdef public dict content
+    cdef public dict normalizer_result
 
     @cython.locals(
         updated = cython.str,
         x = cython.str
     )
-    cdef str update_str_with_chmap(self, str value, dict chmap)
+    cpdef str update_str_with_chmap(
+        self,
+        str value,
+        dict chmap
+    )
 
     @cython.locals(
         actions=cython.dict,
@@ -28,9 +32,15 @@ cdef class Normalizer():
         parameter_value=cython.str,
         subtrie=cython.dict
     )
-    cdef bint make_tokenizer(self, str sdata)
+    cpdef bint make_tokenizer(
+        self,
+        str sdata
+    )
 
-    cdef int chargroup(self, str s)
+    cpdef int chargroup(
+        self,
+        str s
+    )
 
     @cython.locals(
         ret=cython.list,
@@ -38,7 +48,10 @@ cdef class Normalizer():
         j=cython.int,
         k=cython.int
     )
-    cdef list reverse_map(self, list m)
+    cpdef list reverse_map(
+        self,
+        list m
+    )
 
     @cython.locals(
         original_string=cython.str,
@@ -67,20 +80,38 @@ cdef class Normalizer():
         i=cython.int,
         x=cython.str
     )
-    cpdef str normalize(self, str source_string, str word_separator=*, int normalizer_option=*)
+    cpdef str normalize(
+        self,
+        str source_string,
+        str word_separator=*,
+        int normalizer_option=*
+    )
 
 cdef class Builder():
 
-    cdef bint debug
-    cdef bint verbose
-    cdef logger
+    cdef public bint debug
+    cdef public bint verbose
+    cdef public logger
 
-    cdef bint wrap_result(self, root, str address, dict keyhole, str key, str parent, str child)
+    cpdef bint wrap_result(
+        self,
+        root,
+        str address,
+        dict keyhole,
+        str key,
+        str parent,
+        str child
+    )
 
     @cython.locals(
         result=cython.dict
     )
-    cdef dict convert_xml(self, str filename, dict res, str batch_name)
+    cpdef dict convert_xml(
+        self,
+        str filename,
+        dict res,
+        str batch_name
+    )
 
     @cython.locals(
         data=cython.dict,
@@ -89,11 +120,17 @@ cdef class Builder():
         prop=cython.str,
         value=cython.str
     )
-    cdef tuple expose_tokenizer(self, str file_xml)
+    cpdef tuple expose_tokenizer(
+        self,
+        str file_xml
+    )
 
     @cython.locals(
         batch_name=cython.str,
         data=cython.str,
         built=cython.bint
     )
-    cpdef build_normalizer(self, str filename=*)
+    cpdef build_normalizer(
+        self,
+        str filename=*
+    )
