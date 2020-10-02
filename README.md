@@ -287,8 +287,8 @@ call has been set to 0.
 `Normalizer.result['r_map']`: Reverse map between character locations in
 original string and its normalized reflection (item index is character position
 in original string; item value is list [`x`, `y`] where `x` and `y` are
-respectively lowest and highest indexes of mapped characted in normalized
-string.
+respectively lowest and highest indexes of mapped character in normalized
+string).
 
 ```python
 # using default word_separator and normalizer_option
