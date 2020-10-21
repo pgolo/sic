@@ -11,5 +11,5 @@ def normalize(source_string, word_separator=' ', normalizer_option=0):
     global __normalizer__
     if not  __normalizer__:
         build_normalizer()
-    __result__ = __normalizer__.normalize(source_string, word_separator, normalizer_option)
-    return __result__
+    result = __normalizer__.normalize(source_string, word_separator, normalizer_option)
+    return result
