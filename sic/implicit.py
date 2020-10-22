@@ -7,7 +7,7 @@ def __getattr__(name):
     global __normalizer_result__
     if name == 'result':
         return __normalizer_result__
-    #raise AttributeError('Module "{__name__}" has no attribute "{name}".')
+    raise AttributeError('Module "{__name__}" has no attribute "{name}".')
 
 def build_normalizer(filename=None):
     global __normalizer__
