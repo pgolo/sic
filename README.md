@@ -214,11 +214,11 @@ import sic
 For detailed description of all function and methods, see comments in the
 source code.
 
-### Class `Builder`
+### Class `sic.Builder`
 
-**Function** `Builder.build_normalizer()` reads tokenization config,
-instantiates `Normalizer` class that would perform tokenization according to
-rules specified in a given config, and returns this `Normalizer` class
+**Function** `sic.Builder.build_normalizer()` reads tokenization config,
+instantiates `sic.Normalizer` class that would perform tokenization according
+to rules specified in a given config, and returns this `sic.Normalizer` class
 instance.
 
 | ARGUMENT | TYPE | DEFAULT |              DESCRIPTION              |
@@ -237,11 +237,11 @@ machine = builder.build_normalizer()
 machine = builder.build_normalizer('/path/to/config.xml')
 ```
 
-### Class `Normalizer`
+### Class `sic.Normalizer`
 
-**Function** `Normalizer.normalize()` performs string normalization according
-to the rules ingested at the time of class initialization, and returns
-normalized string.
+**Function** `sic.Normalizer.normalize()` performs string normalization
+according to the rules ingested at the time of class initialization, and
+returns normalized string.
 
 |     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION             |
 |:-----------------:|:----:|:-------:|:----------------------------------:|
@@ -265,8 +265,8 @@ controls the way tokenized string is post-processed:
 |   2   | Rearrange tokens in alphabetical order and remove duplicates. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-**Property** `Normalizer.result` retains the result of last call for
-`Normalizer.normalize` function as dict object with the following keys:
+**Property** `sic.Normalizer.result` retains the result of last call for
+`sic.Normalizer.normalize` function as dict object with the following keys:
 
 |     KEY      |   VALUE TYPE    |                 DESCRIPTION                          |
 |:------------:|:---------------:|:----------------------------------------------------:|
@@ -276,21 +276,65 @@ controls the way tokenized string is post-processed:
 | 'r_map'      | list(list(int)) | Reverse map between original and normalized strings. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-`Normalizer.result['map']`: Not only `Normalizer.normalize()` generates
+`sic.Normalizer.result['map']`: Not only `sic.Normalizer.normalize()` generates
 normalized string out of originally provided, it also tries to map character
 indexes in normalized string back on those in the original one. This map is
 represented as list of integers where item index is character position in
 normalized string and item value is character position in original string. This
-is only valid when `normalizer_option` argument for `Normalizer.normalize()`
+is only valid when `normalizer_option` argument for `sic.Normalizer.normalize()`
 call has been set to 0.
 
-`Normalizer.result['r_map']`: Reverse map between character locations in
+`sic.Normalizer.result['r_map']`: Reverse map between character locations in
 original string and its normalized reflection (item index is character position
 in original string; item value is list [`x`, `y`] where `x` and `y` are
 respectively lowest and highest indexes of mapped character in normalized
 string).
 
+### Method `sic.build_normalizer`
+
+`sic.build_normalizer()` implicitly creates single instance of `sic.Normalizer`
+class accessible globally from `sic` namespace. Arguments are same as for
+`sic.Builder.build_normalizer()` function.
+
+### Function `sic.normalize`
+
+`sic.normalize(*args, **kwargs)` either uses global class `sic.Normalizer` or
+instantly creates new local `sic.Normalizer` class, and uses it to perform
+requested string normalization.
+
+|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION                |
+|:-----------------:|:----:|:-------:|:-------------------------------------:|
+| source_string     | str  |   n/a   | String to normalize.                  |
+| word_separator    | str  |   ' '   | Word delimiter (single character).    |
+| normalizer_option | int  |    0    | Mode of post-processing.              |
+| tokenizer_config  | str  |  None   | Path to tokenizer configuration file. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+If `tokenizer_config` argument is not provided, the function will use global
+instance of `sic.Normalizer` class (will create it if it is not initialized).
+
+### Method `sic.reset`
+
+`sic.reset()` resets global `sic.Normalizer` instance to `None`, forcing
+subsequently called `sic.normalize()` to create new global instance again if it
+needs it.
+
+### Attribute `sic.result`
+
+`sic.result` attribute retains the value of `sic.Normalizer.result` property
+that belonged to most recently used `sic.Normalizer` instance accessed from
+`sic.normalize()` function (either global or local).
+
+## Examples
+
 ```python
+import sic
+
+# create Builder object
+builder = sic.Builder()
+# create Normalizer object with default set of rules
+machine = builder.build_normalizer()
+
 # using default word_separator and normalizer_option
 x = machine.normalize('alpha-2-macroglobulin-p')
 print(x) # 'alpha - 2 - macroglobulin - p'
@@ -319,4 +363,15 @@ print(x) # '- - - 2 alpha macroglobulin p'
 # using normalizer_option=2
 x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=2)
 print(x) # '- 2 alpha macroglobulin p'
+
+# ad hoc normalization
+x = sic.normalize('alpha-2-macroglobulin-p', word_separator='|')
+print(x) # 'alpha|-|2|-|macroglobulin|-|p'
+
+sic.build_normalizer('/path/to/config.xml')
+x = sic.normalize('some string')
+print(x) # will be normalized according to config at /path/to/config.xml
+
+x = sic.normalize('some string', tokenizer_config='path/to/another/config.xml')
+print(x) # will be normalized according to config at /path/to/another/config.xml
 ```

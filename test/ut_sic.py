@@ -669,7 +669,59 @@ class TestNormalizer(unittest.TestCase):
             }
         ]
         assert self.assert_normalization('tokenizer_no_plurals_right.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+    
+    def test_implicit_default_normalize(self):
+        sic.reset()
+        result = sic.normalize('nfkappab')
+        expected = 'nf kappa b'
+        result_map = sic.result
+        expected_map = {
+            'original': 'nfkappab',
+            'normalized': 'nf kappa b',
+            'map': [0, 1, 7, 2, 3, 4, 5, 6, 7, 7],
+            'r_map': [[0, 0], [1, 1], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [2, 9]]
+        }
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+        assert result_map == expected_map, 'Expected "%s", got "%s".' % (str(expected_map), str(result_map))
 
+    def test_implicit_normalize_with_parameters(self):
+        result = [
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir)),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir)),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), word_separator='|'),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), word_separator='|'),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), word_separator='|', normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), word_separator='|', normalizer_option=1)
+        ]
+        expected = [
+            'abc , def 123 ghi',
+            'abc , Def 123 ghi',
+            'abc|,|def|123|ghi',
+            'abc|,|Def|123|ghi',
+            ', 123 abc def ghi',
+            ', 123 Def abc ghi',
+            ',|123|abc|def|ghi',
+            ',|123|Def|abc|ghi'
+        ]
+        for i in range(0, len(result)-1):
+            assert result[i] == expected[i], 'Test case #%d: expected "%s", got "%s".' % (i, expected[i], result[i])
+
+    def test_implicit_build_normalize(self):
+        result, expected = [], []
+        sic.build_normalizer('%s/tokenizer_basic_ci.xml' % (self.assets_dir))
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , def 123 ghi')
+        sic.build_normalizer('%s/tokenizer_basic_cs.xml' % (self.assets_dir))
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , Def 123 ghi')
+        result.append(sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir)))
+        expected.append('abc , def 123 ghi')
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , Def 123 ghi')
+        for i in range(0, len(result)-1):
+            assert result[i] == expected[i], 'Test case #%d: expected "%s", got "%s".' % (i, expected[i], result[i])
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
