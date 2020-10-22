@@ -674,7 +674,15 @@ class TestNormalizer(unittest.TestCase):
         sic.reset()
         result = sic.normalize('nfkappab')
         expected = 'nf kappa b'
+        result_map = sic.result
+        expected_map = {
+            'original': 'nfkappab',
+            'normalized': 'nf kappa b',
+            'map': [0, 1, 7, 2, 3, 4, 5, 6, 7, 7],
+            'r_map': [[0, 0], [1, 1], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [2, 9]]
+        }
         assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+        assert result_map == expected_map, 'Expected "%s", got "%s".' % (str(expected_map), str(result_map))
 
     def test_implicit_normalize_with_parameters(self):
         result = [
