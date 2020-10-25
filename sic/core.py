@@ -2,6 +2,43 @@ import os
 import xml.etree.ElementTree as et
 import logging
 
+class Model():
+
+    def __init__(self):
+        self.sdata = ''
+        self.ddata = {'set': set(), 's': set(), 'r': set(), 'c': set()}
+        self.keys = {
+            'set': 'set',
+            'setting': 'set',
+            'settings': 'set',
+            's': 's',
+            'split': 's',
+            'splits': 's',
+            'r': 'r',
+            'replace': 'r',
+            'c': 'c',
+            'char': 'c',
+            'character': 'c'
+        }
+
+    def __repr__(self):
+        return self.sdata
+
+    def add_rule(self, rule):
+        assert isinstance(rule, dict), 'rule must be dict'
+        assert 'key' in rule, 'rule must have \'key\' key'
+        assert 'option' in rule, 'rule must have \'option\' key'
+        assert 'value' in rule, 'rule must have \'value\' key'
+        assert rule['key'] in self.keys, 'rule[\'key\'] must be one of \'%s\'' % ('\', \''.join(self.keys.keys()))
+        if self.keys[rule['key']] == 'set':
+            assert rule['option'] in ['cs', 'bypass'], 'rule[\'option\'] must be one of \'cs\', \'bypass\''
+        if self.keys[rule['key']] == 'set':
+            assert len(self.ddata['set']) == 0, 'model cannot have more than one setting, and it is already %s' % (str(self.ddata['set']))
+        rule_tuple = tuple([rule['option'], rule['value']])
+        if rule_tuple not in self.ddata[self.keys[rule['key']]]:
+            self.sdata += '%s\t%s\t%s\n' % (self.keys[rule['key']], rule['option'], rule['value'])
+        self.ddata[self.keys[rule['key']]].add(rule_tuple)
+
 class Normalizer():
     """This class includes functions and methods for normalizing strings."""
 
@@ -61,9 +98,9 @@ class Normalizer():
         Tokenization rules string requirements:
             1) each line represents single tokenization rule;
             2) each line has at least 3 columns:
-            `s`, `l`|`m`|`r` (or any combination of them), `word` == `split` `word` on the `left`|`middle`|`right`
+            `s`, `l`|`m`|`r` (or any combination of them), `word` == split `word` on the `left`|`middle`|`right`
             *or*
-            `r`, `another_word`, `word` == `replace` `word` with `another_word`
+            `r`, `another_word`, `word` == replace `word` with `another_word`
             *or*
             `c`, `another_char`, `char` == replace `char` with `another_char`
 
