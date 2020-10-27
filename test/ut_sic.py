@@ -723,6 +723,58 @@ class TestNormalizer(unittest.TestCase):
         for i in range(0, len(result)-1):
             assert result[i] == expected[i], 'Test case #%d: expected "%s", got "%s".' % (i, expected[i], result[i])
 
+    def test_ad_hoc_model_empty(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        expected = 'set\tcs\t0\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_add_rule(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.ReplaceToken('bad', 'good'))
+        expected = 'set\tcs\t0\nr\tgood\tbad\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_remove_rule(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.ReplaceToken('bad', 'good'))
+        model.add_rule(sic.ReplaceToken('worse', 'better'))
+        model.remove_rule(sic.ReplaceToken('bad', 'good'))
+        expected = 'set\tcs\t0\nr\tbetter\tworse\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_direct(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        normalizer = sic.Normalizer(None)
+        normalizer.make_tokenizer(str(model))
+        expected = 'a beta z'
+        result = normalizer.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_builder(self):
+        builder = sic.Builder()
+        model = sic.Model()
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        normalizer = builder.build_normalizer(model)
+        expected = 'a beta z'
+        result = normalizer.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_implicit(self):
+        model = sic.Model()
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        sic.build_normalizer(model)
+        expected = 'a beta z'
+        result = sic.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
 if __name__ == '__main__':
     sys.path.insert(0, '')
     import sic # pylint: disable=E0611,F0401

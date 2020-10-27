@@ -9,10 +9,10 @@ def __getattr__(name):
         return __normalizer_result__
     raise AttributeError('Module "{__name__}" has no attribute "{name}".')
 
-def build_normalizer(filename=None):
+def build_normalizer(endpoint=None):
     global __normalizer__
     __builder__ = Builder()
-    __normalizer__ = __builder__.build_normalizer(filename)
+    __normalizer__ = __builder__.build_normalizer(endpoint)
 
 def normalize(*args, **kwargs):
     kwargs['source_string'] = args[0] if len(args) > 0 else kwargs['source_string'] if 'source_string' in kwargs else ''

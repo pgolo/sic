@@ -214,6 +214,57 @@ import sic
 For detailed description of all function and methods, see comments in the
 source code.
 
+### Class `sic.Model`
+
+This class is designed to instanly create tokenization rules directly in
+Python. It is neither convenient nor recommended for complex normalization
+tasks, but can be handy for small ones where using external XML config might
+seem an overkill.
+
+```python
+# instantiate Model
+model = sic.Model()
+
+# model is case-sensitive
+model.case_sensitive = True
+
+# model will do nothing
+model.bypass = True
+```
+
+**Method** `sic.Model.add_rule` adds single tokenization instruction to the
+Model instance:
+
+```python
+# equivalent to XML <split where="lmr" value="beta" />
+model.add_rule(sic.SplitToken('beta', 'lmr'))
+
+# equivalent to XML <token to="good" from="bad" />
+model.add_rule(sic.ReplaceToken('bad', 'good'))
+
+# equivalent to XML <character to="z" from="a" />
+model.add_rule(sic.ReplaceCharacter('a', 'z'))
+```
+
+> **NB**: in case new `sic.ReplaceToken` or `sic.ReplaceChar` instruction
+> contradicts something that is already in the model, the newer instruction
+> overrides older instruction:
+>
+> ```python
+> model.add_rule(sic.ReplaceToken('bad', 'good'))
+> model.add_rule(sic.ReplaceToken('bad', 'better'))
+> ```
+>
+> "bad" --> "good" will not be used; "bad" --> "better" will be used instead
+
+**Method** `sic.Model.remove_rule` removes single tokenization instruction from
+Model instance if is there:
+
+```python
+model.remove_rule(sic.ReplaceToken('bad', 'good'))
+# tokenization rule that fits definition above will be removed from model
+```
+
 ### Class `sic.Builder`
 
 **Function** `sic.Builder.build_normalizer()` reads tokenization config,
@@ -221,10 +272,10 @@ instantiates `sic.Normalizer` class that would perform tokenization according
 to rules specified in a given config, and returns this `sic.Normalizer` class
 instance.
 
-| ARGUMENT | TYPE | DEFAULT |              DESCRIPTION              |
-|:--------:|:----:|:-------:|:-------------------------------------:|
-| filename | str  | None    | Path to tokenizer configuration file. |
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| ARGUMENT |    TYPE     | DEFAULT |              DESCRIPTION              |
+|:--------:|:-----------:|:-------:|:-------------------------------------:|
+| endpoint | str, Model  | None    | Path to tokenizer configuration file. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ```python
 # create Builder object
@@ -235,6 +286,11 @@ machine = builder.build_normalizer()
 
 # create Normalizer object with custom set of rules
 machine = builder.build_normalizer('/path/to/config.xml')
+
+# create Normalizer object using ad hoc model
+model = sic.Model()
+model.add_rule(sic.SplitToken('beta', 'lmr'))
+machine = builder.build_normalizer(model)
 ```
 
 ### Class `sic.Normalizer`

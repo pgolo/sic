@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Implicit instantiation of core classes
+- Classes and function for ad hoc creation of tokenization config
 
 ### Removed
 

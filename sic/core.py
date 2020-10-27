@@ -2,42 +2,90 @@ import os
 import xml.etree.ElementTree as et
 import logging
 
+class Rule():
+    """Generic tokenization rule for ad hoc model creation."""
+
+    def __init__(self, action, value, key):
+        self.action = action
+        self.value = value
+        self.key = key
+
+class SplitToken(Rule):
+    """Instruction to split token."""
+
+    def __init__(self, token, where):
+        assert where.replace('l', '').replace('m', '').replace('r', '') == '', '`where` parameter can only include characters `l`, `m`, or `r`'
+        super().__init__('s', token, where)
+
+class ReplaceToken(Rule):
+    """Instruction to replace token."""
+
+    def __init__(self, replace_from, replace_to):
+        super().__init__('r', replace_from, replace_to)
+
+class ReplaceCharacter(Rule):
+    """Instruction to replace character."""
+
+    def __init__(self, replace_from, replace_to):
+        super().__init__('c', replace_from, replace_to)
+
 class Model():
+    """This class represents set of tokenization rules for ad hoc model creation."""
 
     def __init__(self):
         self.sdata = ''
-        self.ddata = {'set': set(), 's': set(), 'r': set(), 'c': set()}
-        self.keys = {
-            'set': 'set',
-            'setting': 'set',
-            'settings': 'set',
-            's': 's',
-            'split': 's',
-            'splits': 's',
-            'r': 'r',
-            'replace': 'r',
-            'c': 'c',
-            'char': 'c',
-            'character': 'c'
-        }
+        self.case_sensitive = False
+        self.bypass = False
+        self.rules = dict()
+        self._replacements = {'r': dict(), 'c': dict()}
 
     def __repr__(self):
+        if self.bypass:
+            return 'set\tbypass\t1\n'
+        self.sdata = 'set\tcs\t%d\n' % (1 if self.case_sensitive else 0)
+        for action in self.rules:
+            for key in self.rules[action]:
+                for value in self.rules[action][key]:
+                    self.sdata += '%s\t%s\t%s\n' % (action, key, value)
         return self.sdata
 
     def add_rule(self, rule):
-        assert isinstance(rule, dict), 'rule must be dict'
-        assert 'key' in rule, 'rule must have \'key\' key'
-        assert 'option' in rule, 'rule must have \'option\' key'
-        assert 'value' in rule, 'rule must have \'value\' key'
-        assert rule['key'] in self.keys, 'rule[\'key\'] must be one of \'%s\'' % ('\', \''.join(self.keys.keys()))
-        if self.keys[rule['key']] == 'set':
-            assert rule['option'] in ['cs', 'bypass'], 'rule[\'option\'] must be one of \'cs\', \'bypass\''
-        if self.keys[rule['key']] == 'set':
-            assert len(self.ddata['set']) == 0, 'model cannot have more than one setting, and it is already %s' % (str(self.ddata['set']))
-        rule_tuple = tuple([rule['option'], rule['value']])
-        if rule_tuple not in self.ddata[self.keys[rule['key']]]:
-            self.sdata += '%s\t%s\t%s\n' % (self.keys[rule['key']], rule['option'], rule['value'])
-        self.ddata[self.keys[rule['key']]].add(rule_tuple)
+        """This method adds tokenization rule to model.
+
+        Args:
+            *rule* is Rule instance
+        """
+        if rule.action in self._replacements:
+            if rule.value in self._replacements[rule.action]:
+                obsolete_rule = Rule(rule.action, rule.value, self._replacements[rule.action][rule.value])
+                self.remove_rule(obsolete_rule)
+        if rule.action in self.rules:
+            if rule.value in self.rules[rule.action]:
+                if rule.key in self.rules[rule.action][rule.value]:
+                    obsolete_rule = Rule(rule.action, rule.key, rule.value)
+                    self.remove_rule(obsolete_rule)
+        if rule.action not in self.rules:
+            self.rules[rule.action] = dict()
+        if rule.key not in self.rules[rule.action]:
+            self.rules[rule.action][rule.key] = set()
+        self.rules[rule.action][rule.key].add(rule.value)
+        if rule.action in self._replacements:
+            self._replacements[rule.action][rule.value] = rule.key
+
+    def remove_rule(self, rule):
+        """This method removes tokenization rule from model.
+
+        Args:
+            *rule* is Rule instance
+        """
+        if rule.action in self.rules:
+            if rule.key in self.rules[rule.action]:
+                if rule.value in self.rules[rule.action][rule.key]:
+                    self.rules[rule.action][rule.key].remove(rule.value)
+                    if len(self.rules[rule.action][rule.key]) == 0:
+                        del self.rules[rule.action][rule.key]
+                    if len(self.rules[rule.action]) == 0:
+                        del self.rules[rule.action]
 
 class Normalizer():
     """This class includes functions and methods for normalizing strings."""
@@ -477,18 +525,22 @@ class Builder():
                     ret += '{0}\t{1}\t{2}\n'.format(key, prop, value)
         return (data['name'], ret)
 
-    def build_normalizer(self, filename=None):
+    def build_normalizer(self, endpoint=None):
         """This function loads configuration, constructs Normalizer with this configuration,
         and returns this Normalizer object.
 
         Args:
-            str *filename* is XML file defining the configuration of a tokenizer
+            *endpoint* is either Model instance, or path to XML file defining the configuration of a tokenizer
         """
-        if not filename:
-            filename = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
-        (batch_name, data) = self.expose_tokenizer(filename)
-        machine = Normalizer(filename, batch_name)
+        if not endpoint:
+            endpoint = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
+        if isinstance(endpoint, Model):
+            batch_name, data = None, str(endpoint)
+            machine = Normalizer(None, batch_name, self.debug, self.verbose)
+        else:
+            (batch_name, data) = self.expose_tokenizer(endpoint)
+            machine = Normalizer(endpoint, batch_name, self.debug, self.verbose)
         built = machine.make_tokenizer(data)
         if not built:
-            logging.critical('Could not build normalizer using "{0}"!'.format(filename))
+            logging.critical('Endpoint %s: Could not build normalizer' % (endpoint))
         return machine
