@@ -527,7 +527,7 @@ class Builder():
 
     def build_normalizer(self, endpoint=None):
         """This function loads configuration, constructs Normalizer with this configuration,
-        and returns this Normalizer object.
+        and returns created Normalizer object.
 
         Args:
             *endpoint* is either Model instance, or path to XML file defining the configuration of a tokenizer
