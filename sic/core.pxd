@@ -1,5 +1,23 @@
 import cython
 
+cdef class Model():
+
+    cdef str sdata
+    cdef public bint case_sensitive
+    cdef public bint bypass
+    cdef dict rules
+    cdef dict _replacements
+
+    cpdef add_rule(
+        self,
+        rule
+    )
+
+    cpdef remove_rule(
+        self,
+        rule
+    )
+
 cdef class Normalizer():
 
     cdef public bint debug
@@ -132,5 +150,5 @@ cdef class Builder():
     )
     cpdef build_normalizer(
         self,
-        str filename=*
+        endpoint=*
     )

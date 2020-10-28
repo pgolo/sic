@@ -2,6 +2,91 @@ import os
 import xml.etree.ElementTree as et
 import logging
 
+class Rule():
+    """Generic tokenization rule for ad hoc model creation."""
+
+    def __init__(self, action, value, key):
+        self.action = action
+        self.value = value
+        self.key = key
+
+class SplitToken(Rule):
+    """Instruction to split token."""
+
+    def __init__(self, token, where):
+        assert where.replace('l', '').replace('m', '').replace('r', '') == '', '`where` parameter can only include characters `l`, `m`, or `r`'
+        super().__init__('s', token, where)
+
+class ReplaceToken(Rule):
+    """Instruction to replace token."""
+
+    def __init__(self, replace_from, replace_to):
+        super().__init__('r', replace_from, replace_to)
+
+class ReplaceCharacter(Rule):
+    """Instruction to replace character."""
+
+    def __init__(self, replace_from, replace_to):
+        super().__init__('c', replace_from, replace_to)
+
+class Model():
+    """This class represents set of tokenization rules for ad hoc model creation."""
+
+    def __init__(self):
+        self.sdata = ''
+        self.case_sensitive = False
+        self.bypass = False
+        self.rules = dict()
+        self._replacements = {'r': dict(), 'c': dict()}
+
+    def __repr__(self):
+        if self.bypass:
+            return 'set\tbypass\t1\n'
+        self.sdata = 'set\tcs\t%d\n' % (1 if self.case_sensitive else 0)
+        for action in self.rules:
+            for key in self.rules[action]:
+                for value in self.rules[action][key]:
+                    self.sdata += '%s\t%s\t%s\n' % (action, key, value)
+        return self.sdata
+
+    def add_rule(self, rule):
+        """This method adds tokenization rule to model.
+
+        Args:
+            *rule* is Rule instance
+        """
+        if rule.action in self._replacements:
+            if rule.value in self._replacements[rule.action]:
+                obsolete_rule = Rule(rule.action, rule.value, self._replacements[rule.action][rule.value])
+                self.remove_rule(obsolete_rule)
+        if rule.action in self.rules:
+            if rule.value in self.rules[rule.action]:
+                if rule.key in self.rules[rule.action][rule.value]:
+                    obsolete_rule = Rule(rule.action, rule.key, rule.value)
+                    self.remove_rule(obsolete_rule)
+        if rule.action not in self.rules:
+            self.rules[rule.action] = dict()
+        if rule.key not in self.rules[rule.action]:
+            self.rules[rule.action][rule.key] = set()
+        self.rules[rule.action][rule.key].add(rule.value)
+        if rule.action in self._replacements:
+            self._replacements[rule.action][rule.value] = rule.key
+
+    def remove_rule(self, rule):
+        """This method removes tokenization rule from model.
+
+        Args:
+            *rule* is Rule instance
+        """
+        if rule.action in self.rules:
+            if rule.key in self.rules[rule.action]:
+                if rule.value in self.rules[rule.action][rule.key]:
+                    self.rules[rule.action][rule.key].remove(rule.value)
+                    if len(self.rules[rule.action][rule.key]) == 0:
+                        del self.rules[rule.action][rule.key]
+                    if len(self.rules[rule.action]) == 0:
+                        del self.rules[rule.action]
+
 class Normalizer():
     """This class includes functions and methods for normalizing strings."""
 
@@ -61,9 +146,9 @@ class Normalizer():
         Tokenization rules string requirements:
             1) each line represents single tokenization rule;
             2) each line has at least 3 columns:
-            `s`, `l`|`m`|`r` (or any combination of them), `word` == `split` `word` on the `left`|`middle`|`right`
+            `s`, `l`|`m`|`r` (or any combination of them), `word` == split `word` on the `left`|`middle`|`right`
             *or*
-            `r`, `another_word`, `word` == `replace` `word` with `another_word`
+            `r`, `another_word`, `word` == replace `word` with `another_word`
             *or*
             `c`, `another_char`, `char` == replace `char` with `another_char`
 
@@ -440,18 +525,22 @@ class Builder():
                     ret += '{0}\t{1}\t{2}\n'.format(key, prop, value)
         return (data['name'], ret)
 
-    def build_normalizer(self, filename=None):
+    def build_normalizer(self, endpoint=None):
         """This function loads configuration, constructs Normalizer with this configuration,
-        and returns this Normalizer object.
+        and returns created Normalizer object.
 
         Args:
-            str *filename* is XML file defining the configuration of a tokenizer
+            *endpoint* is either Model instance, or path to XML file defining the configuration of a tokenizer
         """
-        if not filename:
-            filename = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
-        (batch_name, data) = self.expose_tokenizer(filename)
-        machine = Normalizer(filename, batch_name)
+        if not endpoint:
+            endpoint = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
+        if isinstance(endpoint, Model):
+            batch_name, data = None, str(endpoint)
+            machine = Normalizer(None, batch_name, self.debug, self.verbose)
+        else:
+            (batch_name, data) = self.expose_tokenizer(endpoint)
+            machine = Normalizer(endpoint, batch_name, self.debug, self.verbose)
         built = machine.make_tokenizer(data)
         if not built:
-            logging.critical('Could not build normalizer using "{0}"!'.format(filename))
+            logging.critical('Endpoint %s: Could not build normalizer' % (endpoint))
         return machine
