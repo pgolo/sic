@@ -674,7 +674,10 @@ class TestNormalizer(unittest.TestCase):
         sic.reset()
         result = sic.normalize('nfkappab')
         expected = 'nf kappa b'
-        result_map = sic.result
+        if isinstance(sic.result, dict):
+            result_map = sic.result
+        else:
+            result_map = sic.result()
         expected_map = {
             'original': 'nfkappab',
             'normalized': 'nf kappa b',

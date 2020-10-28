@@ -32,6 +32,9 @@ def normalize(*args, **kwargs):
     __normalizer_result__ = __normalizer__.normalizer_result
     return result
 
+def result():
+    return __normalizer_result__
+
 def reset():
     global __normalizer__
     __normalizer__ = None

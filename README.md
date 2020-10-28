@@ -375,11 +375,20 @@ instance of `sic.Normalizer` class (will create it if it is not initialized).
 subsequently called `sic.normalize()` to create new global instance again if it
 needs it.
 
-### Attribute `sic.result`
+### Attribute `sic.result`, function `sic.result()`
 
 `sic.result` attribute retains the value of `sic.Normalizer.result` property
 that belonged to most recently used `sic.Normalizer` instance accessed from
 `sic.normalize()` function (either global or local).
+
+Python 3.6 does not support [PEP-562](https://www.python.org/dev/peps/pep-0562/)
+(module attributes). So in Python 3.6, use function `sic.result()` rather than
+attribute `sic.result`:
+
+```python
+sic.result() # will work in Python >= 3.6
+sic.result   # will work in Python >= 3.7
+```
 
 ## Examples
 

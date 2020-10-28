@@ -7,4 +7,6 @@ cpdef build_normalizer(
     endpoint=*
 )
 
+cpdef result()
+
 cpdef reset()
