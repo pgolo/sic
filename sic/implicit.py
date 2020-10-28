@@ -55,3 +55,9 @@ def reset():
     """
     global __normalizer__
     __normalizer__ = None
+
+def save(filename):
+    pass
+
+def load(filename):
+    pass

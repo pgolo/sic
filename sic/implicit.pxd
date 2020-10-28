@@ -10,3 +10,7 @@ cpdef build_normalizer(
 cpdef result()
 
 cpdef reset()
+
+cpdef save(str filename)
+
+cpdef load(str filename)

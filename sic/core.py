@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as et
 import logging
+import pickle
 
 class Rule():
     """Generic tokenization rule for ad hoc model creation."""
@@ -447,6 +448,13 @@ class Normalizer():
             self.normalizer_result['r_map'] = self.reverse_map(self.normalizer_result['map'])
         self.normalizer_result['normalized'] = normalized
         return normalized
+
+    def save(self, filename):
+        pass
+
+    @classmethod
+    def load(self, filename):
+        pass
 
 class Builder():
     """This class is the builder for Normalizer."""
