@@ -104,6 +104,16 @@ cdef class Normalizer():
         int normalizer_option=*
     )
 
+    cpdef save(
+        self,
+        str filename
+    )
+
+    cpdef load(
+        self,
+        str filename
+    )
+
 cdef class Builder():
 
     cdef public bint debug

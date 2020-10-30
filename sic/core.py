@@ -449,11 +449,24 @@ class Normalizer():
         return normalized
 
     def save(self, filename):
-        pass
+        """This method pickles normalizer to a file.
+
+        Args:
+            *filename* is path/filename to save Normalizer object to
+        """
+        with open(filename, mode='wb') as f:
+            pickle.dump(self, f)
 
     @classmethod
     def load(self, filename):
-        pass
+        """This function unpickles normalizer from a file.
+
+        Args:
+            *filename* is path/filename to load Normalizer object from
+        """
+        with open(filename, mode='rb') as f:
+            normalizer = pickle.load(f)
+        return normalizer
 
 class Builder():
     """This class is the builder for Normalizer."""
