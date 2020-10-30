@@ -1,6 +1,7 @@
 import os
 import xml.etree.ElementTree as et
 import logging
+import pickle
 
 class Rule():
     """Generic tokenization rule for ad hoc model creation."""
@@ -90,7 +91,7 @@ class Model():
 class Normalizer():
     """This class includes functions and methods for normalizing strings."""
 
-    def __init__(self, filename, tokenizer_name='', debug_mode=False, verbose_mode=False):
+    def __init__(self, tokenizer_name='', debug_mode=False, verbose_mode=False):
         logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
         self.debug = debug_mode
         self.verbose = verbose_mode
@@ -99,7 +100,6 @@ class Normalizer():
             logging.root.setLevel(logging.INFO)
         if self.debug:
             logging.root.setLevel(logging.DEBUG)
-        self.filename = filename
         self.tokenizer_name = tokenizer_name
         self.normalizer_result = {'original': '', 'normalized': '', 'map': [], 'r_map': []}
         self.content = dict()
@@ -448,6 +448,26 @@ class Normalizer():
         self.normalizer_result['normalized'] = normalized
         return normalized
 
+    def save(self, filename):
+        """This method pickles normalizer to a file.
+
+        Args:
+            *filename* is path/filename to save Normalizer object to
+        """
+        with open(filename, mode='wb') as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(self, filename):
+        """This function unpickles normalizer from a file.
+
+        Args:
+            *filename* is path/filename to load Normalizer object from
+        """
+        with open(filename, mode='rb') as f:
+            normalizer = pickle.load(f)
+        return normalizer
+
 class Builder():
     """This class is the builder for Normalizer."""
 
@@ -536,10 +556,10 @@ class Builder():
             endpoint = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
         if isinstance(endpoint, Model):
             batch_name, data = None, str(endpoint)
-            machine = Normalizer(None, batch_name, self.debug, self.verbose)
+            machine = Normalizer(batch_name, self.debug, self.verbose)
         else:
             (batch_name, data) = self.expose_tokenizer(endpoint)
-            machine = Normalizer(endpoint, batch_name, self.debug, self.verbose)
+            machine = Normalizer(batch_name, self.debug, self.verbose)
         built = machine.make_tokenizer(data)
         if not built:
             logging.critical('Endpoint %s: Could not build normalizer' % (endpoint))

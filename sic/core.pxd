@@ -23,7 +23,6 @@ cdef class Normalizer():
     cdef public bint debug
     cdef public bint verbose
     cdef public logger
-    cdef public str filename
     cdef public str tokenizer_name
     cdef public dict content
     cdef public dict normalizer_result
@@ -103,6 +102,16 @@ cdef class Normalizer():
         str source_string,
         str word_separator=*,
         int normalizer_option=*
+    )
+
+    cpdef save(
+        self,
+        str filename
+    )
+
+    cpdef load(
+        self,
+        str filename
     )
 
 cdef class Builder():

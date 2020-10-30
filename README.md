@@ -295,6 +295,22 @@ machine = builder.build_normalizer(model)
 
 ### Class `sic.Normalizer`
 
+**Method** `sic.Normalizer.save()` saves instance of `sic.Normalizer` class to
+a specified file (pickle).
+
+| ARGUMENT | TYPE | DEFAULT |           DESCRIPTION           |
+|:--------:|:----:|:-------:|:-------------------------------:|
+| filename | str  |   n/a   | Path and name of file to write. |
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+**Function** `sic.Normalizer.load()` reads specified file (pickle) and returns
+`sic.Normalizer` instance.
+
+| ARGUMENT | TYPE | DEFAULT |          DESCRIPTION           |
+|:--------:|:----:|:-------:|:------------------------------:|
+| filename | str  |   n/a   | Path and name of file to read. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 **Function** `sic.Normalizer.normalize()` performs string normalization
 according to the rules ingested at the time of class initialization, and
 returns normalized string.
@@ -346,13 +362,24 @@ in original string; item value is list [`x`, `y`] where `x` and `y` are
 respectively lowest and highest indexes of mapped character in normalized
 string).
 
-### Method `sic.build_normalizer`
+### Method `sic.build_normalizer()`
 
 `sic.build_normalizer()` implicitly creates single instance of `sic.Normalizer`
 class accessible globally from `sic` namespace. Arguments are same as for
 `sic.Builder.build_normalizer()` function.
 
-### Function `sic.normalize`
+### Method `sic.save()`
+
+`sic.save()` saves global instance of `sic.Normalizer` class to a specified
+file (pickle). Arguments are same as for `sic.Normalizer.save()` method.
+
+### Function `sic.load()`
+
+`sic.load()` reads specified file (pickle) and returns instance of
+`sic.Normalizer` class stored in that file. Arguments are same as for
+`sic.Normalizer.load()` function.
+
+### Function `sic.normalize()`
 
 `sic.normalize(*args, **kwargs)` either uses global class `sic.Normalizer` or
 instantly creates new local `sic.Normalizer` class, and uses it to perform
@@ -369,7 +396,7 @@ requested string normalization.
 If `tokenizer_config` argument is not provided, the function will use global
 instance of `sic.Normalizer` class (will create it if it is not initialized).
 
-### Method `sic.reset`
+### Method `sic.reset()`
 
 `sic.reset()` resets global `sic.Normalizer` instance to `None`, forcing
 subsequently called `sic.normalize()` to create new global instance again if it
@@ -437,6 +464,10 @@ sic.build_normalizer('/path/to/config.xml')
 x = sic.normalize('some string')
 print(x) # will be normalized according to config at /path/to/config.xml
 
-x = sic.normalize('some string', tokenizer_config='path/to/another/config.xml')
+x = sic.normalize('some string', tokenizer_config='/path/to/another/config.xml')
 print(x) # will be normalized according to config at /path/to/another/config.xml
+
+# save/load compiled normalizer to/from disk
+machine.save('/path/to/file') # will write /path/to/file
+another_machine = sic.Normalizer.load('/path/to/file') # will read /path/to/file
 ```
