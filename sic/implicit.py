@@ -57,7 +57,19 @@ def reset():
     __normalizer__ = None
 
 def save(filename):
-    pass
+    """This method pickles normalizer to a file.
+
+    Args:
+        *filename* is path/filename to save Normalizer object to
+    """
+    global __normalizer__
+    __normalizer__.save(filename)
 
 def load(filename):
-    pass
+    """This function unpickles normalizer from a file.
+
+    Args:
+        *filename* is path/filename to load Normalizer object from
+    """
+    global __normalizer__
+    __normalizer__ = Normalizer.load(filename)
