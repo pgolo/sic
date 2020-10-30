@@ -1,3 +1,4 @@
+import os
 import sys
 import unittest
 
@@ -777,6 +778,61 @@ class TestNormalizer(unittest.TestCase):
         expected = 'a beta z'
         result = sic.normalize('abetaz')
         assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_save_load_compiled_save_explicit_load_explicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_explicit_load_explicit.pic' % (self.assets_dir)
+        builder = sic.Builder()
+        normalizer1 = builder.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = normalizer1.normalize(test_string)
+        normalizer1.save(pickled_path)
+        normalizer2 = sic.Normalizer.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = normalizer2.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_explicit_load_implicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_explicit_load_implicit.pic' % (self.assets_dir)
+        builder = sic.Builder()
+        normalizer1 = builder.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = normalizer1.normalize(test_string)
+        normalizer1.save(pickled_path)
+        sic.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = sic.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_implicit_load_explicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_implicit_load_explicit.pic' % (self.assets_dir)
+        sic.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = sic.normalize(test_string)
+        sic.save(pickled_path)
+        normalizer2 = sic.Normalizer.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = normalizer2.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_implicit_load_implicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_implicit_load_implicit.pic' % (self.assets_dir)
+        sic.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = sic.normalize(test_string)
+        sic.save(pickled_path)
+        sic.reset()
+        sic.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = sic.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
