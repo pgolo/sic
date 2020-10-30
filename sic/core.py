@@ -91,7 +91,7 @@ class Model():
 class Normalizer():
     """This class includes functions and methods for normalizing strings."""
 
-    def __init__(self, filename, tokenizer_name='', debug_mode=False, verbose_mode=False):
+    def __init__(self, tokenizer_name='', debug_mode=False, verbose_mode=False):
         logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
         self.debug = debug_mode
         self.verbose = verbose_mode
@@ -100,7 +100,6 @@ class Normalizer():
             logging.root.setLevel(logging.INFO)
         if self.debug:
             logging.root.setLevel(logging.DEBUG)
-        self.filename = filename
         self.tokenizer_name = tokenizer_name
         self.normalizer_result = {'original': '', 'normalized': '', 'map': [], 'r_map': []}
         self.content = dict()
@@ -544,10 +543,10 @@ class Builder():
             endpoint = '%s/tokenizer.standard.xml' % (os.path.abspath(os.path.dirname(__file__)))
         if isinstance(endpoint, Model):
             batch_name, data = None, str(endpoint)
-            machine = Normalizer(None, batch_name, self.debug, self.verbose)
+            machine = Normalizer(batch_name, self.debug, self.verbose)
         else:
             (batch_name, data) = self.expose_tokenizer(endpoint)
-            machine = Normalizer(endpoint, batch_name, self.debug, self.verbose)
+            machine = Normalizer(batch_name, self.debug, self.verbose)
         built = machine.make_tokenizer(data)
         if not built:
             logging.critical('Endpoint %s: Could not build normalizer' % (endpoint))

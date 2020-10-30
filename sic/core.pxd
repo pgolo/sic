@@ -23,7 +23,6 @@ cdef class Normalizer():
     cdef public bint debug
     cdef public bint verbose
     cdef public logger
-    cdef public str filename
     cdef public str tokenizer_name
     cdef public dict content
     cdef public dict normalizer_result
