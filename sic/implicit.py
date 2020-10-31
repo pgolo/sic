@@ -72,4 +72,5 @@ def load(filename):
         *filename* is path/filename to load Normalizer object from
     """
     global __normalizer__
-    __normalizer__ = Normalizer.load(filename)
+    build_normalizer()
+    __normalizer__.load(filename)

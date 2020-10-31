@@ -295,16 +295,16 @@ machine = builder.build_normalizer(model)
 
 ### Class `sic.Normalizer`
 
-**Method** `sic.Normalizer.save()` saves instance of `sic.Normalizer` class to
-a specified file (pickle).
+**Method** `sic.Normalizer.save()` saves data structure from instance of
+`sic.Normalizer` class to a specified file (pickle).
 
 | ARGUMENT | TYPE | DEFAULT |           DESCRIPTION           |
 |:--------:|:----:|:-------:|:-------------------------------:|
 | filename | str  |   n/a   | Path and name of file to write. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-**Function** `sic.Normalizer.load()` reads specified file (pickle) and returns
-`sic.Normalizer` instance.
+**Function** `sic.Normalizer.load()` reads specified file (pickle) and places
+data structure in `sic.Normalizer` instance.
 
 | ARGUMENT | TYPE | DEFAULT |          DESCRIPTION           |
 |:--------:|:----:|:-------:|:------------------------------:|
@@ -370,14 +370,15 @@ class accessible globally from `sic` namespace. Arguments are same as for
 
 ### Method `sic.save()`
 
-`sic.save()` saves global instance of `sic.Normalizer` class to a specified
-file (pickle). Arguments are same as for `sic.Normalizer.save()` method.
+`sic.save()` saves data structure stored in global instance of `sic.Normalizer`
+class to a specified file (pickle). Arguments are same as for
+`sic.Normalizer.save()` method.
 
 ### Function `sic.load()`
 
-`sic.load()` reads specified file (pickle) and returns instance of
-`sic.Normalizer` class stored in that file. Arguments are same as for
-`sic.Normalizer.load()` function.
+`sic.load()` reads specified file (pickle) and places data structure in global
+instance of `sic.Normalizer` class stored in that file. Arguments are same as
+for `sic.Normalizer.load()` function.
 
 ### Function `sic.normalize()`
 
@@ -469,5 +470,6 @@ print(x) # will be normalized according to config at /path/to/another/config.xml
 
 # save/load compiled normalizer to/from disk
 machine.save('/path/to/file') # will write /path/to/file
-another_machine = sic.Normalizer.load('/path/to/file') # will read /path/to/file
+another_machine = sic.Normalizer()
+another_machine.load('/path/to/file') # will read /path/to/file
 ```

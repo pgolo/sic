@@ -455,9 +455,8 @@ class Normalizer():
             *filename* is path/filename to save Normalizer object to
         """
         with open(filename, mode='wb') as f:
-            pickle.dump(self, f)
+            pickle.dump(self.data, f)
 
-    @classmethod
     def load(self, filename):
         """This function unpickles normalizer from a file.
 
@@ -465,8 +464,7 @@ class Normalizer():
             *filename* is path/filename to load Normalizer object from
         """
         with open(filename, mode='rb') as f:
-            normalizer = pickle.load(f)
-        return normalizer
+            self.data = pickle.load(f)
 
 class Builder():
     """This class is the builder for Normalizer."""
