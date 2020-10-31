@@ -1,6 +1,6 @@
-import sys; sys.path.insert(0, '')
+import os
+import sys
 import unittest
-import sic # pylint: disable=E0611,F0401
 
 class TestNormalizer(unittest.TestCase):
 
@@ -670,7 +670,178 @@ class TestNormalizer(unittest.TestCase):
             }
         ]
         assert self.assert_normalization('tokenizer_no_plurals_right.xml', 'test_plurals', testcases) == True, 'Something is wrong.'
+    
+    def test_implicit_default_normalize(self):
+        sic.reset()
+        result = sic.normalize('nfkappab')
+        expected = 'nf kappa b'
+        if isinstance(sic.result, dict):
+            result_map = sic.result
+        else:
+            result_map = sic.result()
+        expected_map = {
+            'original': 'nfkappab',
+            'normalized': 'nf kappa b',
+            'map': [0, 1, 7, 2, 3, 4, 5, 6, 7, 7],
+            'r_map': [[0, 0], [1, 1], [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [2, 9]]
+        }
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+        assert result_map == expected_map, 'Expected "%s", got "%s".' % (str(expected_map), str(result_map))
 
+    def test_implicit_normalize_with_parameters(self):
+        result = [
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir)),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir)),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), word_separator='|'),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), word_separator='|'),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir), word_separator='|', normalizer_option=1),
+            sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_cs.xml' % (self.assets_dir), word_separator='|', normalizer_option=1)
+        ]
+        expected = [
+            'abc , def 123 ghi',
+            'abc , Def 123 ghi',
+            'abc|,|def|123|ghi',
+            'abc|,|Def|123|ghi',
+            ', 123 abc def ghi',
+            ', 123 Def abc ghi',
+            ',|123|abc|def|ghi',
+            ',|123|Def|abc|ghi'
+        ]
+        for i in range(0, len(result)-1):
+            assert result[i] == expected[i], 'Test case #%d: expected "%s", got "%s".' % (i, expected[i], result[i])
+
+    def test_implicit_build_normalize(self):
+        result, expected = [], []
+        sic.build_normalizer('%s/tokenizer_basic_ci.xml' % (self.assets_dir))
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , def 123 ghi')
+        sic.build_normalizer('%s/tokenizer_basic_cs.xml' % (self.assets_dir))
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , Def 123 ghi')
+        result.append(sic.normalize('abc,Def123ghi', tokenizer_config='%s/tokenizer_basic_ci.xml' % (self.assets_dir)))
+        expected.append('abc , def 123 ghi')
+        result.append(sic.normalize('abc,Def123ghi'))
+        expected.append('abc , Def 123 ghi')
+        for i in range(0, len(result)-1):
+            assert result[i] == expected[i], 'Test case #%d: expected "%s", got "%s".' % (i, expected[i], result[i])
+
+    def test_ad_hoc_model_empty(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        expected = 'set\tcs\t0\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_add_rule(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.ReplaceToken('bad', 'good'))
+        expected = 'set\tcs\t0\nr\tgood\tbad\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_remove_rule(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.ReplaceToken('bad', 'good'))
+        model.add_rule(sic.ReplaceToken('worse', 'better'))
+        model.remove_rule(sic.ReplaceToken('bad', 'good'))
+        expected = 'set\tcs\t0\nr\tbetter\tworse\n'
+        result = str(model)
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_direct(self):
+        model = sic.Model()
+        model.case_sensitive = False
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        normalizer = sic.Normalizer(None)
+        normalizer.make_tokenizer(str(model))
+        expected = 'a beta z'
+        result = normalizer.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_builder(self):
+        builder = sic.Builder()
+        model = sic.Model()
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        normalizer = builder.build_normalizer(model)
+        expected = 'a beta z'
+        result = normalizer.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_ad_hoc_model_implicit(self):
+        model = sic.Model()
+        model.add_rule(sic.SplitToken('beta', 'lmr'))
+        sic.build_normalizer(model)
+        expected = 'a beta z'
+        result = sic.normalize('abetaz')
+        assert result == expected, 'Expected "%s", got "%s".' % (expected, result)
+
+    def test_save_load_compiled_save_explicit_load_explicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_explicit_load_explicit.pic' % (self.assets_dir)
+        builder = sic.Builder()
+        normalizer1 = builder.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = normalizer1.normalize(test_string)
+        normalizer1.save(pickled_path)
+        normalizer2 = sic.Normalizer()
+        normalizer2.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = normalizer2.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_explicit_load_implicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_explicit_load_implicit.pic' % (self.assets_dir)
+        builder = sic.Builder()
+        normalizer1 = builder.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = normalizer1.normalize(test_string)
+        normalizer1.save(pickled_path)
+        sic.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = sic.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_implicit_load_explicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_implicit_load_explicit.pic' % (self.assets_dir)
+        sic.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = sic.normalize(test_string)
+        sic.save(pickled_path)
+        normalizer2 = sic.Normalizer()
+        normalizer2.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = normalizer2.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
+
+    def test_save_load_compiled_save_implicit_load_implicit(self):
+        test_string = 'original string, transformed string'
+        expected = 'transformed string , transformed string'
+        pickled_path = '%s/test_save_load_compiled_save_implicit_load_implicit.pic' % (self.assets_dir)
+        sic.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        normalized1 = sic.normalize(test_string)
+        sic.save(pickled_path)
+        sic.reset()
+        sic.load(pickled_path)
+        os.remove(pickled_path)
+        normalized2 = sic.normalize(test_string)
+        assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
+        assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
 
 if __name__ == '__main__':
-    unittest.main()
+    sys.path.insert(0, '')
+    import sic # pylint: disable=E0611,F0401
+    unittest.main(exit=False)
+    try:
+        import bin as sic # pylint: disable=E0611,F0401
+        unittest.main()
+    except ModuleNotFoundError:
+        print('Could not import module from /bin, test skipped.')

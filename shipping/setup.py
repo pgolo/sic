@@ -9,7 +9,7 @@ with open('README.md', mode='r', encoding='utf8') as f:
 
 setup(
     name='sic',
-    version='1.0.6',
+    version='1.1.0',
     description='Utility for string normalization',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -22,13 +22,14 @@ setup(
     license='MIT',
     platforms=['any'],
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Text Processing :: Linguistic',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],

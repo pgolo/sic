@@ -175,8 +175,8 @@ Below are descriptions and examples of tokenizer config elements.
 | `<split>`     | where="l" value="?"               | Separates token specified in `value` from **left** part of a bigger token.                                                            | where="l" value="kappa": `nf kappab` --> `nf kappa b`                |
 | `<split>`     | where="m" value="?"               | Separates token specified in `value` when it is found in the **middle** of a bigger token.                                            | where="m" value="kappa": `nfkappab` --> `nf kappa b`                 |
 | `<split>`     | where="r" value="?"               | Separates token specified in `value` from **right** part of a bigger token.                                                           | where="r" value="gamma": `ifngamma` --> `ifn gamma`                  |
-| `<token>`     | to="?" from="?"                   | Replaces token specified in `to` with another token specified in `from`.                                                              | to="protein" from="gene": `nf kappa b gene` --> `nf kappa b protein` |
-| `<character>` | to="?" from="?"                   | Replaces character specified in `to` with another character specified in `from`.                                                      | to="e" from="ë": `citroën` --> `citroen`                             |
+| `<token>`     | to="?" from="?"                   | Replaces token specified in `from` with another token specified in `to`.                                                              | to="protein" from="gene": `nf kappa b gene` --> `nf kappa b protein` |
+| `<character>` | to="?" from="?"                   | Replaces character specified in `from` with another character specified in `to`.                                                      | to="e" from="ë": `citroën` --> `citroen`                             |
 ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 Attribute `where` of `<split>` element may have any combination of `l`, `m`, or
@@ -184,15 +184,15 @@ Attribute `where` of `<split>` element may have any combination of `l`, `m`, or
 places of a bigger string. So, instead of three different elements
 
 ```xml
-<split where="l" value="word">
-<split where="m" value="word">
-<split where="r" value="word">
+<split where="l" value="word" />
+<split where="m" value="word" />
+<split where="r" value="word" />
 ```
 
 using the following single one
 
 ```xml
-<split where="lmr" value="word">
+<split where="lmr" value="word" />
 ```
 
 will achieve the same result.
@@ -214,17 +214,68 @@ import sic
 For detailed description of all function and methods, see comments in the
 source code.
 
-### Class `Builder`
+### Class `sic.Model`
 
-**Function** `Builder.build_normalizer()` reads tokenization config,
-instantiates `Normalizer` class that would perform tokenization according to
-rules specified in a given config, and returns this `Normalizer` class
+This class is designed to instanly create tokenization rules directly in
+Python. It is neither convenient nor recommended for complex normalization
+tasks, but can be handy for small ones where using external XML config might
+seem an overkill.
+
+```python
+# instantiate Model
+model = sic.Model()
+
+# model is case-sensitive
+model.case_sensitive = True
+
+# model will do nothing
+model.bypass = True
+```
+
+**Method** `sic.Model.add_rule` adds single tokenization instruction to the
+Model instance:
+
+```python
+# equivalent to XML <split where="lmr" value="beta" />
+model.add_rule(sic.SplitToken('beta', 'lmr'))
+
+# equivalent to XML <token to="good" from="bad" />
+model.add_rule(sic.ReplaceToken('bad', 'good'))
+
+# equivalent to XML <character to="z" from="a" />
+model.add_rule(sic.ReplaceCharacter('a', 'z'))
+```
+
+> **NB**: in case new `sic.ReplaceToken` or `sic.ReplaceChar` instruction
+> contradicts something that is already in the model, the newer instruction
+> overrides older instruction:
+>
+> ```python
+> model.add_rule(sic.ReplaceToken('bad', 'good'))
+> model.add_rule(sic.ReplaceToken('bad', 'better'))
+> ```
+>
+> "bad" --> "good" will not be used; "bad" --> "better" will be used instead
+
+**Method** `sic.Model.remove_rule` removes single tokenization instruction from
+Model instance if is there:
+
+```python
+model.remove_rule(sic.ReplaceToken('bad', 'good'))
+# tokenization rule that fits definition above will be removed from model
+```
+
+### Class `sic.Builder`
+
+**Function** `sic.Builder.build_normalizer()` reads tokenization config,
+instantiates `sic.Normalizer` class that would perform tokenization according
+to rules specified in a given config, and returns this `sic.Normalizer` class
 instance.
 
-| ARGUMENT | TYPE | DEFAULT |              DESCRIPTION              |
-|:--------:|:----:|:-------:|:-------------------------------------:|
-| filename | str  | None    | Path to tokenizer configuration file. |
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+| ARGUMENT |    TYPE     | DEFAULT |              DESCRIPTION              |
+|:--------:|:-----------:|:-------:|:-------------------------------------:|
+| endpoint | str, Model  | None    | Path to tokenizer configuration file. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ```python
 # create Builder object
@@ -235,13 +286,34 @@ machine = builder.build_normalizer()
 
 # create Normalizer object with custom set of rules
 machine = builder.build_normalizer('/path/to/config.xml')
+
+# create Normalizer object using ad hoc model
+model = sic.Model()
+model.add_rule(sic.SplitToken('beta', 'lmr'))
+machine = builder.build_normalizer(model)
 ```
 
-### Class `Normalizer`
+### Class `sic.Normalizer`
 
-**Function** `Normalizer.normalize()` performs string normalization according
-to the rules ingested at the time of class initialization, and returns
-normalized string.
+**Method** `sic.Normalizer.save()` saves data structure from instance of
+`sic.Normalizer` class to a specified file (pickle).
+
+| ARGUMENT | TYPE | DEFAULT |           DESCRIPTION           |
+|:--------:|:----:|:-------:|:-------------------------------:|
+| filename | str  |   n/a   | Path and name of file to write. |
+|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+**Function** `sic.Normalizer.load()` reads specified file (pickle) and places
+data structure in `sic.Normalizer` instance.
+
+| ARGUMENT | TYPE | DEFAULT |          DESCRIPTION           |
+|:--------:|:----:|:-------:|:------------------------------:|
+| filename | str  |   n/a   | Path and name of file to read. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+**Function** `sic.Normalizer.normalize()` performs string normalization
+according to the rules ingested at the time of class initialization, and
+returns normalized string.
 
 |     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION             |
 |:-----------------:|:----:|:-------:|:----------------------------------:|
@@ -265,8 +337,8 @@ controls the way tokenized string is post-processed:
 |   2   | Rearrange tokens in alphabetical order and remove duplicates. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-**Property** `Normalizer.result` retains the result of last call for
-`Normalizer.normalize` function as dict object with the following keys:
+**Property** `sic.Normalizer.result` retains the result of last call for
+`sic.Normalizer.normalize` function as dict object with the following keys:
 
 |     KEY      |   VALUE TYPE    |                 DESCRIPTION                          |
 |:------------:|:---------------:|:----------------------------------------------------:|
@@ -276,21 +348,86 @@ controls the way tokenized string is post-processed:
 | 'r_map'      | list(list(int)) | Reverse map between original and normalized strings. |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-`Normalizer.result['map']`: Not only `Normalizer.normalize()` generates
+`sic.Normalizer.result['map']`: Not only `sic.Normalizer.normalize()` generates
 normalized string out of originally provided, it also tries to map character
 indexes in normalized string back on those in the original one. This map is
 represented as list of integers where item index is character position in
 normalized string and item value is character position in original string. This
-is only valid when `normalizer_option` argument for `Normalizer.normalize()`
+is only valid when `normalizer_option` argument for `sic.Normalizer.normalize()`
 call has been set to 0.
 
-`Normalizer.result['r_map']`: Reverse map between character locations in
+`sic.Normalizer.result['r_map']`: Reverse map between character locations in
 original string and its normalized reflection (item index is character position
 in original string; item value is list [`x`, `y`] where `x` and `y` are
-respectively lowest and highest indexes of mapped characted in normalized
-string.
+respectively lowest and highest indexes of mapped character in normalized
+string).
+
+### Method `sic.build_normalizer()`
+
+`sic.build_normalizer()` implicitly creates single instance of `sic.Normalizer`
+class accessible globally from `sic` namespace. Arguments are same as for
+`sic.Builder.build_normalizer()` function.
+
+### Method `sic.save()`
+
+`sic.save()` saves data structure stored in global instance of `sic.Normalizer`
+class to a specified file (pickle). Arguments are same as for
+`sic.Normalizer.save()` method.
+
+### Function `sic.load()`
+
+`sic.load()` reads specified file (pickle) and places data structure in global
+instance of `sic.Normalizer` class stored in that file. Arguments are same as
+for `sic.Normalizer.load()` function.
+
+### Function `sic.normalize()`
+
+`sic.normalize(*args, **kwargs)` either uses global class `sic.Normalizer` or
+instantly creates new local `sic.Normalizer` class, and uses it to perform
+requested string normalization.
+
+|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION                |
+|:-----------------:|:----:|:-------:|:-------------------------------------:|
+| source_string     | str  |   n/a   | String to normalize.                  |
+| word_separator    | str  |   ' '   | Word delimiter (single character).    |
+| normalizer_option | int  |    0    | Mode of post-processing.              |
+| tokenizer_config  | str  |  None   | Path to tokenizer configuration file. |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+If `tokenizer_config` argument is not provided, the function will use global
+instance of `sic.Normalizer` class (will create it if it is not initialized).
+
+### Method `sic.reset()`
+
+`sic.reset()` resets global `sic.Normalizer` instance to `None`, forcing
+subsequently called `sic.normalize()` to create new global instance again if it
+needs it.
+
+### Attribute `sic.result`, function `sic.result()`
+
+`sic.result` attribute retains the value of `sic.Normalizer.result` property
+that belonged to most recently used `sic.Normalizer` instance accessed from
+`sic.normalize()` function (either global or local).
+
+Python 3.6 does not support [PEP-562](https://www.python.org/dev/peps/pep-0562/)
+(module attributes). So in Python 3.6, use function `sic.result()` rather than
+attribute `sic.result`:
 
 ```python
+sic.result() # will work in Python >= 3.6
+sic.result   # will work in Python >= 3.7
+```
+
+## Examples
+
+```python
+import sic
+
+# create Builder object
+builder = sic.Builder()
+# create Normalizer object with default set of rules
+machine = builder.build_normalizer()
+
 # using default word_separator and normalizer_option
 x = machine.normalize('alpha-2-macroglobulin-p')
 print(x) # 'alpha - 2 - macroglobulin - p'
@@ -319,4 +456,20 @@ print(x) # '- - - 2 alpha macroglobulin p'
 # using normalizer_option=2
 x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=2)
 print(x) # '- 2 alpha macroglobulin p'
+
+# ad hoc normalization
+x = sic.normalize('alpha-2-macroglobulin-p', word_separator='|')
+print(x) # 'alpha|-|2|-|macroglobulin|-|p'
+
+sic.build_normalizer('/path/to/config.xml')
+x = sic.normalize('some string')
+print(x) # will be normalized according to config at /path/to/config.xml
+
+x = sic.normalize('some string', tokenizer_config='/path/to/another/config.xml')
+print(x) # will be normalized according to config at /path/to/another/config.xml
+
+# save/load compiled normalizer to/from disk
+machine.save('/path/to/file') # will write /path/to/file
+another_machine = sic.Normalizer()
+another_machine.load('/path/to/file') # will read /path/to/file
 ```
