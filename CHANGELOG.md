@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [X.X.X] - XXXX-XX-XX
+
+### Added
+
+### Removed
+
+### Changed
+
 ## [1.1.0] - 2020-10-31
 
 ### Added
@@ -13,10 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Classes and function for ad hoc creation of tokenization config
 - Methods to save (pickle) and load (unpickle) compiled Normalizer instance
 - Wheel for Python 3.9
-
-### Removed
-
-### Changed
 
 ## [1.0.6] - 2020-09-10
 
