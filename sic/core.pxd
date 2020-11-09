@@ -1,5 +1,11 @@
 import cython
 
+cdef class Rule():
+
+    cpdef decode(
+        self
+    )
+
 cdef class Model():
 
     cdef str sdata
@@ -51,7 +57,8 @@ cdef class Normalizer():
     )
     cpdef bint make_tokenizer(
         self,
-        str sdata
+        str sdata,
+        bint update=*
     )
 
     cpdef int chargroup(

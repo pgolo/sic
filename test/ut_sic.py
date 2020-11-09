@@ -836,6 +836,23 @@ class TestNormalizer(unittest.TestCase):
         assert expected == normalized1, 'Expected "%s", got "%s".' % (expected, normalized1)
         assert expected == normalized2, 'Expected "%s", got "%s".' % (expected, normalized2)
 
+    def test_decode_rule(self):
+        rule = sic.ReplaceCharacter('f', 't')
+        decoded = rule.decode()
+        expected = 'c\tt\tf\n'
+        assert expected == decoded, 'Expected "%s", got "%s".' % (expected, decoded)
+
+    def test_updated_compiled_normalizer(self):
+        builder = sic.Builder()
+        worker = builder.build_normalizer('%s/tokenizer_replace_token.xml' % (self.assets_dir))
+        rules = [sic.ReplaceCharacter('t', 'n')]
+        decoded = ''.join([x.decode() for x in rules])
+        worker.make_tokenizer(decoded, update=True)
+        test_string = 'original string, transformed string'
+        normalized = worker.normalize(test_string)
+        expected = 'transformed snring , nransformed snring'
+        assert expected == normalized, 'Expected "%s", got "%s".' % (expected, normalized)
+
 if __name__ == '__main__':
     sys.path.insert(0, '')
     import sic # pylint: disable=E0611,F0401
