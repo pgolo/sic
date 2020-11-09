@@ -472,4 +472,10 @@ print(x) # will be normalized according to config at /path/to/another/config.xml
 machine.save('/path/to/file') # will write /path/to/file
 another_machine = sic.Normalizer()
 another_machine.load('/path/to/file') # will read /path/to/file
+
+# add more rules to already compiled model
+# (assuming `machine` is sic.Normalizer instance armed with tokenization ruleset)
+new_ruleset = [sic.ReplaceToken('from', 'to'), sic.SplitToken('token', 'r')]
+new_ruleset_string = ''.join([rule.decode() for rule in new_ruleset])
+machine.make_tokenizer(new_ruleset_string, update=True) # rules from `new_ruleset` will be added to the normalizer
 ```
