@@ -142,6 +142,7 @@ class Normalizer():
 
         Args:
             *sdata* is string with set of tokrules
+            *update* - when True, existing trie will be updated rather than new trie creted
 
         Returns:
             The dictionary object to store the output
