@@ -11,6 +11,9 @@ class Rule():
         self.value = value
         self.key = key
 
+    def decode(self):
+        return '%s\t%s\t%s\n' % (self.action, self.key, self.value)
+
 class SplitToken(Rule):
     """Instruction to split token."""
 
@@ -133,7 +136,7 @@ class Normalizer():
             updated += chmap[x] if x in chmap else x
         return updated
 
-    def make_tokenizer(self, sdata):
+    def make_tokenizer(self, sdata, update=False):
         """This function loads static set of tokienization rules stored in
         tab-delimited string into trie implemented as nested dictionary structure.
 
@@ -166,9 +169,12 @@ class Normalizer():
             's': {'l': '~l', 'm': '~m', 'r': '~r'},
             'c': {'': '~='}
         }
-        trie = dict()
-        trie['_settings'] = dict()
-        trie['_chmap'] = dict()
+        if update:
+            trie = self.content
+        else:
+            trie = dict()
+            trie['_settings'] = dict()
+            trie['_chmap'] = dict()
         for line in sdata.splitlines():
             if not line.strip().startswith('#'):
                 [action, parameter, subject] = line.strip().split('\t')[0:3]
