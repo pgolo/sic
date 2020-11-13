@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tokenizer name="expanded">
+  <setting name="cs" value="0" />
+  <token from="abc" to="def" />
+  <token from="def" to="ghi" />
+  <token from="ghi" to="jkl" />
+  <character from="z" to="y" />
+  <character from="y" to="x" />
+  <character from="x" to="w" />
+</tokenizer>
