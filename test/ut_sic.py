@@ -856,12 +856,12 @@ class TestNormalizer(unittest.TestCase):
     def test_expanded_tokenizer(self):
         builder = sic.Builder()
         worker = builder.build_normalizer('%s/tokenizer_expanded.xml' % (self.assets_dir))
-        test_string1 = '123abc456'
-        test_string2 = '123def456'
-        test_string3 = '123ghi456'
-        expected1 = '123 jkl 456'
-        test_string4 = '123xyz456'
-        expected2 = '123 www 456'
+        test_string1 = '123abc456mmm'
+        test_string2 = '123def456mmm'
+        test_string3 = '123ghi456mmm'
+        expected1 = '123 jkl 456 nnn'
+        test_string4 = '123xyz456 nnn'
+        expected2 = '123 www 456 nnn'
         normalized1 = worker.normalize(test_string1)
         normalized2 = worker.normalize(test_string2)
         normalized3 = worker.normalize(test_string3)

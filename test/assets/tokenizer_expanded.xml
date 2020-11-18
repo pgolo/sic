@@ -4,7 +4,9 @@
   <token from="abc" to="def" />
   <token from="def" to="ghi" />
   <token from="ghi" to="jkl" />
+  <token from="mmm" to="nnn" />
   <character from="z" to="y" />
   <character from="y" to="x" />
   <character from="x" to="w" />
+  <split value="abc" where="lmr" />
 </tokenizer>
