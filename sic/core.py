@@ -128,7 +128,13 @@ class Normalizer():
         self.content = obj
 
     def expand_instruction(self, g, node, visited):
-        """docstring
+        """Helper function that traverses a path and returns terminal node.
+        For a directed graph *g*, it is assumed that each node has at most 1 descendant.
+
+        Args:
+            *g* is a dict(str, str) representing a graph
+            *node* is starting node
+            *visited* is a set to keep visited nodes for cycle detection
         """
         if node in visited:
             raise RecursionError('Circular reference in replacement instruction regarding "%s"' % (node))
@@ -138,7 +144,11 @@ class Normalizer():
         return node
 
     def merge_replacements(self, sdata):
-        """docstring
+        """This function takes *sdata* config string, merges classes of "c" and "r" tokenization rules,
+        and returns corrected configuration string that accounts for transitive rules.
+
+        Args:
+            *sdata* is string with set of tokrules
         """
         ret = ''
         replacements = dict()
