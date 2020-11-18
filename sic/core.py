@@ -127,6 +127,49 @@ class Normalizer():
     def data(self, obj):
         self.content = obj
 
+    def expand_instruction(self, g, node, visited):
+        """Helper function that traverses a path and returns terminal node.
+        For a directed graph *g*, it is assumed that each node has at most 1 descendant.
+
+        Args:
+            *g* is a dict(str, str) representing a graph
+            *node* is starting node
+            *visited* is a set to keep visited nodes for cycle detection
+        """
+        if node in visited:
+            raise RecursionError('Circular reference in replacement instruction regarding "%s"' % (node))
+        visited.add(node)
+        if node in g:
+            node = self.expand_instruction(g, g[node], visited)
+        return node
+
+    def merge_replacements(self, sdata):
+        """This function takes *sdata* config string, merges classes of "c" and "r" tokenization rules,
+        and returns corrected configuration string that accounts for transitive rules.
+
+        Args:
+            *sdata* is string with set of tokrules
+        """
+        ret = ''
+        replacements = dict()
+        for line in sdata.splitlines():
+            if not line.strip().startswith('#'):
+                [action, parameter, subject] = line.strip().split('\t')[0:3]
+                if action in ['c', 'r']:
+                    if action not in replacements:
+                        replacements[action] = dict()
+                    if subject not in replacements[action]:
+                        replacements[action][subject] = parameter
+                    elif replacements[action][subject] != parameter:
+                        raise ValueError('Conflicting instruction: (replace "%s" --> "%s") vs (replace "%s" --> "%s")' % (subject, replacements[action][subject], subject, parameter))
+                    continue
+            ret += '%s\n' % (line)
+        for action in replacements:
+            for node in replacements[action]:
+                replacements[action][node] = self.expand_instruction(replacements[action], node, set())
+                ret += '%s\t%s\t%s\n' % (action, replacements[action][node], node)
+        return ret
+
     def update_str_with_chmap(self, value, chmap):
         """This function zooms through a string *value*, replaces characters
         according to *chmap* dictionary object, and returns the updated string.
@@ -165,6 +208,7 @@ class Normalizer():
             '~r' => s r (split right)
         """
         # TODO: review for refacting, stay dry
+        sdata = self.merge_replacements(sdata)
         actions = {
             'r': {'': '~_'},
             's': {'l': '~l', 'm': '~m', 'r': '~r'},
@@ -547,7 +591,7 @@ class Builder():
         for key in ['set', 's', 'r', 'c']:
             for prop in data[key]:
                 for value in data[key][prop]:
-                    ret += '{0}\t{1}\t{2}\n'.format(key, prop, value)
+                    ret += '%s\t%s\t%s\n' % (key, prop, value)
         return (data['name'], ret)
 
     def build_normalizer(self, endpoint=None):

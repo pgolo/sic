@@ -853,6 +853,24 @@ class TestNormalizer(unittest.TestCase):
         expected = 'transformed snring , nransformed snring'
         assert expected == normalized, 'Expected "%s", got "%s".' % (expected, normalized)
 
+    def test_expanded_tokenizer(self):
+        builder = sic.Builder()
+        worker = builder.build_normalizer('%s/tokenizer_expanded.xml' % (self.assets_dir))
+        test_string1 = '123abc456mmm'
+        test_string2 = '123def456mmm'
+        test_string3 = '123ghi456mmm'
+        expected1 = '123 jkl 456 nnn'
+        test_string4 = '123xyz456 nnn'
+        expected2 = '123 www 456 nnn'
+        normalized1 = worker.normalize(test_string1)
+        normalized2 = worker.normalize(test_string2)
+        normalized3 = worker.normalize(test_string3)
+        normalized4 = worker.normalize(test_string4)
+        assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
+        assert expected1 == normalized2, 'Expected "%s", got "%s".' % (expected1, normalized2)
+        assert expected1 == normalized3, 'Expected "%s", got "%s".' % (expected1, normalized3)
+        assert expected2 == normalized4, 'Expected "%s", got "%s".' % (expected1, normalized4)
+
 if __name__ == '__main__':
     sys.path.insert(0, '')
     import sic # pylint: disable=E0611,F0401
