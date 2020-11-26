@@ -530,7 +530,7 @@ class Builder():
             logging.basicConfig(level=logging.DEBUG)
 
     def wrap_result(self, root, address, keyhole, key, parent, child):
-        """This function populates dict object *keyhole* with the data retrieved from XML elemebt *root* as follows:
+        """This function populates dict object *keyhole* with the data retrieved from XML element *root* as follows:
             keyhole[key][root/address.col2][root/address.col3]
 
         Args:
