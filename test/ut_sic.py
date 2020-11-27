@@ -880,12 +880,14 @@ class TestNormalizer(unittest.TestCase):
         test_string4 = '123SpeLING-Is-Corrected'; expected4 = '123spelling-Is-Corrected'; normalized4 = worker.normalize(test_string4, normalizer_option=3)
         test_string5 = '123speLIng-Is-Corrected'; expected5 = '123spelling-Is-Corrected'; normalized5 = worker.normalize(test_string5, normalizer_option=3)
         test_string6 = '123speLING-Is-Corrected'; expected6 = '123spelling-Is-Corrected'; normalized6 = worker.normalize(test_string6, normalizer_option=3)
+        test_string7 = 'Halfsplitted Is Incorrect'; expected7 = 'Halfsplit Is Correct'; normalized7 = worker.normalize(test_string7, normalizer_option=3)
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
         assert expected3 == normalized3, 'Expected "%s", got "%s".' % (expected3, normalized3)
         assert expected4 == normalized4, 'Expected "%s", got "%s".' % (expected4, normalized4)
         assert expected5 == normalized5, 'Expected "%s", got "%s".' % (expected5, normalized5)
         assert expected6 == normalized6, 'Expected "%s", got "%s".' % (expected6, normalized6)
+        assert expected7 == normalized7, 'Expected "%s", got "%s".' % (expected7, normalized7)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')

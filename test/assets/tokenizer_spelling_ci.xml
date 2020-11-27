@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tokenizer name="tokenizer_spelling_ci">
   <setting name="cs" value="0" />
+  <split value="splitted" where="lmr" />
+  <token to="split" from="splitted" />
+  <token to="correct" from="incorrect" />
   <token to="spelling" from="speling" />
 </tokenizer>

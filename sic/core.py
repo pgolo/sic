@@ -278,6 +278,17 @@ class Normalizer():
             return 2
         return 0
 
+    def transform_case(self, replacement, original, normalizer_option):
+        """TODO: add docstring
+        """
+        if normalizer_option != 3:
+            return replacement
+        if original == original.upper():
+            return replacement.upper()
+        elif original[0] == original[0].upper() and original[1:] == original[1:].lower():
+            return replacement[0].upper() + replacement[1:].lower()
+        return replacement
+
     def reverse_map(self, m):
         """This function takes character location map in a form it is stored at self.normalizer_result['map']
         and returns list where item index is character index in original string, and item value is pair
@@ -316,6 +327,7 @@ class Normalizer():
         if source_string == '':
             return ''
         original_string = source_string
+        parsed_string = source_string
         subtrie = self.content
         if '_settings' in subtrie and 'bypass' in subtrie['_settings'] and subtrie['_settings']['bypass'] == '1':
             self.normalizer_result['normalized'] = original_string
@@ -323,7 +335,9 @@ class Normalizer():
             self.normalizer_result['r_map'] = [(i, i) for i in range(len(original_string))]
             return original_string
         if '_settings' not in subtrie or 'cs' not in subtrie['_settings'] or subtrie['_settings']['cs'] != '1':
-            original_string = original_string.lower()
+            parsed_string = parsed_string.lower()
+            if normalizer_option != 3:
+                original_string = parsed_string
         this_fragment = ''
         buffer = ''
         last_buffer = ''
@@ -332,9 +346,9 @@ class Normalizer():
         b_map = []
         l_map = []
         t_map = []
-        this_group = last_group = self.chargroup(original_string[0])
-        total_length = int(len(original_string))
-        character = original_string[0]
+        this_group = last_group = self.chargroup(parsed_string[0])
+        total_length = int(len(parsed_string))
+        character = parsed_string[0]
         last_character = ''
         current_index = 0
         temp_index = -1
@@ -347,9 +361,10 @@ class Normalizer():
         last_separators = [0, 0]
         separator_index = set()
         while current_index < total_length:
-            character = original_string[current_index]
+            character, original_character = parsed_string[current_index], original_string[current_index]
             if character in self.content['_chmap']:
                 character = self.content['_chmap'][character]
+                original_character = character
             this_group = self.chargroup(character)
             on_the_right = False
             added_separator = False
@@ -392,7 +407,7 @@ class Normalizer():
                 on_the_left = on_the_left or added_separator or last_character == word_separator
                 began_reading = True
                 subtrie = subtrie[character]
-                buffer += character
+                buffer += original_character
                 b_map += [current_index for x in character]
             else:
                 on_the_right = on_the_right or character == word_separator
@@ -403,12 +418,12 @@ class Normalizer():
                     # we may need to apply this replacement in future, so keep buffer value and subtrie['~_']
                     last_buffer = buffer
                     last_separators[0], last_separators[1] = separators[0], separators[1]
-                    last_replacement = subtrie['~_']
+                    last_replacement = self.transform_case(subtrie['~_'], last_buffer, normalizer_option)
                     l_map = [b_map[0] for i in range(len(last_replacement))]
                 if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
                     # now buffer has token to be replaced
-                    buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
-                    separators[1] = 1
+                    buffer = self.transform_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
+                    separators[1] = 1 if parsed_string[current_index] != word_separator else 0
                     b_map = [b_map[0] for i in range(len(buffer))]
                     last_buffer = ''
                     last_separators[0], last_separators[1] = 0, 0
@@ -471,7 +486,7 @@ class Normalizer():
                 this_fragment += buffer
                 if separators[1]:
                     separator_index.add(len(this_fragment) - 1)
-                buffer = character
+                buffer = original_character
                 separators[0], separators[1] = 0, 0
                 b_map = [current_index for x in character]
                 on_the_left = False
@@ -488,7 +503,7 @@ class Normalizer():
         on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
         if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
             # now buffer has token to be replaced
-            buffer = subtrie['~_'] + word_separator #if not buffer.endswith(word_separator) else ''
+            buffer = self.transform_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
             separators[1] = 1
             b_map = [b_map[0] for i in range(len(buffer))]
             last_buffer = ''
