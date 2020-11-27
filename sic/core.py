@@ -302,14 +302,13 @@ class Normalizer():
         return ret
 
     def normalize(self, source_string, word_separator=' ', normalizer_option=0):
-        # TODO: update docstring
         """This function zooms through the provided string character by character
         and returns string which is normalized representation of a given string.
 
         Args:
             *source_string* is input string to normalize
             *word_separator* is word separator to consider (must be single character)
-            *normalizer_option* is integer either 0 (normal, default), 1 (list), or 2 (set)
+            *normalizer_option* is integer either 0 (normal, default), 1 (list), 2 (set), 3 (join split tokens back)
         """
         assert len(word_separator) == 1, 'word_separator must be single character'
         # TODO: review for refactoring
