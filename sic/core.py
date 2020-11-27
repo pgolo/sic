@@ -346,7 +346,7 @@ class Normalizer():
         added_separator = False
         separators = [0, 0]
         last_separators = [0, 0]
-        separator_index = []
+        separator_index = set()
         while current_index < total_length:
             character = original_string[current_index]
             if character in self.content['_chmap']:
@@ -373,7 +373,7 @@ class Normalizer():
                 if not began_reading:
                     if on_the_left and this_fragment and this_fragment[-1:] != word_separator:
                         this_fragment += word_separator
-                        separator_index.append(len(this_fragment) - 1)
+                        separator_index.add(len(this_fragment) - 1)
                         if len(f_map) == len(this_fragment):
                             f_map[-1] = current_index
                         else:
@@ -383,10 +383,10 @@ class Normalizer():
                         this_fragment = this_fragment[:-1]
                     f_map += b_map
                     if separators[0]:
-                        separator_index.append(len(this_fragment))
+                        separator_index.add(len(this_fragment))
                     this_fragment += buffer
                     if separators[1]:
-                        separator_index.append(len(this_fragment) - 1)
+                        separator_index.add(len(this_fragment) - 1)
                     buffer = ''
                     separators[0], separators[1] = 0, 0
                     b_map = []
@@ -440,10 +440,10 @@ class Normalizer():
                     if last_buffer:
                         f_map = f_map[:-len(last_buffer)] + l_map
                         if last_separators[0]:
-                            separator_index.append(len(this_fragment))
+                            separator_index.add(len(this_fragment))
                         this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
                         if last_separators[1]:
-                            separator_index.append(len(this_fragment) - 1)
+                            separator_index.add(len(this_fragment) - 1)
                     temp_index = -1
                 if '~r' in subtrie and on_the_right:
                     if not buffer.startswith(word_separator):
@@ -458,7 +458,7 @@ class Normalizer():
                     continue
                 if on_the_left and this_fragment and this_fragment[-1:] != word_separator and character != word_separator and not added_separator:
                     this_fragment += word_separator
-                    separator_index.append(len(this_fragment))
+                    separator_index.add(len(this_fragment))
                     if len(f_map) == len(this_fragment):
                         f_map[-1] = current_index
                     else:
@@ -468,10 +468,10 @@ class Normalizer():
                     this_fragment = this_fragment[:-1]
                 f_map += b_map
                 if separators[0]:
-                    separator_index.append(len(this_fragment))
+                    separator_index.add(len(this_fragment))
                 this_fragment += buffer
                 if separators[1]:
-                    separator_index.append(len(this_fragment) - 1)
+                    separator_index.add(len(this_fragment) - 1)
                 buffer = character
                 separators[0], separators[1] = 0, 0
                 b_map = [current_index for x in character]
@@ -504,23 +504,23 @@ class Normalizer():
             if last_buffer:
                 f_map += l_map
                 if last_separators[0]:
-                    separator_index.append(len(this_fragment))
+                    separator_index.add(len(this_fragment))
                 this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
                 if last_separators[1]:
-                    separator_index.append(len(this_fragment))
+                    separator_index.add(len(this_fragment))
         if on_the_left and this_fragment[-1:] != word_separator:
             this_fragment += word_separator
-            separator_index.append(len(this_fragment) + 1)
+            separator_index.add(len(this_fragment) + 1)
             f_map.append(total_length - 1)
         if this_fragment.endswith(word_separator) and buffer.startswith(word_separator):
             f_map.pop()
             this_fragment = this_fragment[:-1]
         f_map += b_map
         if separators[0]:
-            separator_index.append(len(this_fragment))
+            separator_index.add(len(this_fragment))
         this_fragment += buffer
         if last_separators[1]:
-            separator_index.append(len(this_fragment) - 1)
+            separator_index.add(len(this_fragment) - 1)
         while this_fragment.startswith(word_separator):
             this_fragment = this_fragment[len(word_separator):]
             f_map = f_map[len(word_separator):]
