@@ -279,7 +279,13 @@ class Normalizer():
         return 0
 
     def transform_case(self, replacement, original, normalizer_option):
-        """TODO: add docstring
+        """This function aligns letter case in *replacement* with that in *original*
+        (only if *normalizer_option* assumes this is to be done)
+
+        Args:
+            *replacement* is string whose letter case is to be reviewed
+            *original* is string that is to serve as letter case template
+            *normalizer_option* is integer
         """
         if normalizer_option != 3:
             return replacement
