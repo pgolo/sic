@@ -58,10 +58,10 @@ over another depending on usage scenario. The benchmark is below.
 
 | STRING LENGTH | REPEATS | VERSION | MEAN TIME (s) |
 |:-------------:|:-------:|:-------:|:-------------:|
-| 71            | 10000   | .tar.gz | 1.4           |
-| 71            | 10000   | wheel   | 0.4           |
-| 710000        | 1       | .tar.gz | 2.2           |
-| 710000        | 1       | wheel   | 14.0          |
+| 71            | 10000   | .tar.gz | 1.8           |
+| 71            | 10000   | wheel   | 0.5           |
+| 710000        | 1       | .tar.gz | 2.7           |
+| 710000        | 1       | wheel   | 15.9          |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ## Tokenization configs
