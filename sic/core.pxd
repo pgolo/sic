@@ -86,6 +86,13 @@ cdef class Normalizer():
         str s
     )
 
+    cpdef str align_case(
+        self,
+        str replacement,
+        str original,
+        int normalizer_option
+    )
+
     @cython.locals(
         ret=cython.list,
         i=cython.int,
@@ -99,6 +106,7 @@ cdef class Normalizer():
 
     @cython.locals(
         original_string=cython.str,
+        parsed_string=cython.str,
         subtrie=cython.dict,
         this_fragment=cython.str,
         buffer=cython.str,
@@ -120,6 +128,9 @@ cdef class Normalizer():
         on_the_left=cython.bint,
         on_the_right=cython.bint,
         added_separator=cython.bint,
+        separators=cython.list,
+        last_separators=cython.list,
+        separator_index=cython.set,
         normalized=cython.str,
         i=cython.int,
         x=cython.str

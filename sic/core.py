@@ -278,7 +278,7 @@ class Normalizer():
             return 2
         return 0
 
-    def transform_case(self, replacement, original, normalizer_option):
+    def align_case(self, replacement, original, normalizer_option):
         """This function aligns letter case in *replacement* with that in *original*
         (only if *normalizer_option* assumes this is to be done)
 
@@ -424,11 +424,11 @@ class Normalizer():
                     # we may need to apply this replacement in future, so keep buffer value and subtrie['~_']
                     last_buffer = buffer
                     last_separators[0], last_separators[1] = separators[0], separators[1]
-                    last_replacement = self.transform_case(subtrie['~_'], last_buffer, normalizer_option)
+                    last_replacement = self.align_case(subtrie['~_'], last_buffer, normalizer_option)
                     l_map = [b_map[0] for i in range(len(last_replacement))]
                 if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
                     # now buffer has token to be replaced
-                    buffer = self.transform_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
+                    buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
                     separators[1] = 1 if parsed_string[current_index] != word_separator else 0
                     b_map = [b_map[0] for i in range(len(buffer))]
                     last_buffer = ''
@@ -509,7 +509,7 @@ class Normalizer():
         on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
         if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
             # now buffer has token to be replaced
-            buffer = self.transform_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
+            buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
             separators[1] = 1
             b_map = [b_map[0] for i in range(len(buffer))]
             last_buffer = ''
