@@ -477,7 +477,7 @@ print(x) # '- 2 alpha macroglobulin p'
 # <split value="mis" where="l" />
 # <token to="spelling" from="speling" />
 x = machine.normalize('Misspeling')
-print(x) # Misspelling
+print(x) # 'Misspelling'
 ```
 
 ### Using implicitly instantiated classes
