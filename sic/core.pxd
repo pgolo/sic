@@ -33,6 +33,26 @@ cdef class Normalizer():
     cdef public dict content
     cdef public dict normalizer_result
 
+    cpdef str expand_instruction(
+        self,
+        dict g,
+        str node,
+        set visited
+    )
+
+    @cython.locals(
+        ret=cython.str,
+        replacements=cython.dict,
+        line=cython.str,
+        action=cython.str,
+        parameter=cython.str,
+        subject=cython.str
+    )
+    cpdef str merge_replacements(
+        self,
+        str sdata
+    )
+
     @cython.locals(
         updated = cython.str,
         x = cython.str
@@ -66,6 +86,13 @@ cdef class Normalizer():
         str s
     )
 
+    cpdef str align_case(
+        self,
+        str replacement,
+        str original,
+        int normalizer_option
+    )
+
     @cython.locals(
         ret=cython.list,
         i=cython.int,
@@ -79,6 +106,7 @@ cdef class Normalizer():
 
     @cython.locals(
         original_string=cython.str,
+        parsed_string=cython.str,
         subtrie=cython.dict,
         this_fragment=cython.str,
         buffer=cython.str,
@@ -100,6 +128,9 @@ cdef class Normalizer():
         on_the_left=cython.bint,
         on_the_right=cython.bint,
         added_separator=cython.bint,
+        separators=cython.list,
+        last_separators=cython.list,
+        separator_index=cython.set,
         normalized=cython.str,
         i=cython.int,
         x=cython.str

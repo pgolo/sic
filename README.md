@@ -58,10 +58,10 @@ over another depending on usage scenario. The benchmark is below.
 
 | STRING LENGTH | REPEATS | VERSION | MEAN TIME (s) |
 |:-------------:|:-------:|:-------:|:-------------:|
-| 71            | 10000   | .tar.gz | 1.4           |
-| 71            | 10000   | wheel   | 0.4           |
-| 710000        | 1       | .tar.gz | 2.2           |
-| 710000        | 1       | wheel   | 14.0          |
+| 71            | 10000   | .tar.gz | 1.8           |
+| 71            | 10000   | wheel   | 0.5           |
+| 710000        | 1       | .tar.gz | 2.7           |
+| 710000        | 1       | wheel   | 15.9          |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 ## Tokenization configs
@@ -327,7 +327,7 @@ tokens. The default value is `' '` (space) which seems reasonable choice for
 natural language. However any character can be specified, which might be more
 useful in certain context.
 
-`normalizer_option`: The value can be either one of `0`, `1`, or `2` and
+`normalizer_option`: The value can be either one of `0`, `1`, `2`, or `3` and
 controls the way tokenized string is post-processed:
 
 | VALUE |                             MODE                              |
@@ -335,6 +335,7 @@ controls the way tokenized string is post-processed:
 |   0   | No post-processing.                                           |
 |   1   | Rearrange tokens in alphabetical order.                       |
 |   2   | Rearrange tokens in alphabetical order and remove duplicates. |
+|   3   | Remove all added word separators.                             |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 **Property** `sic.Normalizer.result` retains the result of last call for
@@ -420,6 +421,8 @@ sic.result   # will work in Python >= 3.7
 
 ## Examples
 
+### Basic usage
+
 ```python
 import sic
 
@@ -444,36 +447,67 @@ print(machine.result)
   ]
 }
 """
+```
 
-# using custom word separator
+### Custom word separator
+
+```python
 x = machine.normalize('alpha-2-macroglobulin-p', word_separator='|')
 print(x) # 'alpha|-|2|-|macroglobulin|-|p'
+```
 
+### Post-processing options
+
+```python
 # using normalizer_option=1
 x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=1)
 print(x) # '- - - 2 alpha macroglobulin p'
+```
 
+```python
 # using normalizer_option=2
 x = machine.normalize('alpha-2-macroglobulin-p', normalizer_option=2)
 print(x) # '- 2 alpha macroglobulin p'
+```
 
-# ad hoc normalization
+```python
+# using normalizer_option=3
+# assuming normalization config includes the following:
+# <setting name="cs" value="0" />
+# <split value="mis" where="l" />
+# <token to="spelling" from="speling" />
+x = machine.normalize('Misspeling')
+print(x) # 'Misspelling'
+```
+
+### Using implicitly instantiated classes
+
+```python
+# normalize() with default instance
 x = sic.normalize('alpha-2-macroglobulin-p', word_separator='|')
 print(x) # 'alpha|-|2|-|macroglobulin|-|p'
 
+# custom configuration for implicitly instantiated normalizer
 sic.build_normalizer('/path/to/config.xml')
 x = sic.normalize('some string')
 print(x) # will be normalized according to config at /path/to/config.xml
 
+# custom config and normalization in one line
 x = sic.normalize('some string', tokenizer_config='/path/to/another/config.xml')
 print(x) # will be normalized according to config at /path/to/another/config.xml
+```
 
-# save/load compiled normalizer to/from disk
+### Saving and loading compiled normalizer to/from disk
+
+```python
 machine.save('/path/to/file') # will write /path/to/file
 another_machine = sic.Normalizer()
 another_machine.load('/path/to/file') # will read /path/to/file
+```
 
-# add more rules to already compiled model
+### Adding normalization rules to already compiled model
+
+```python
 # (assuming `machine` is sic.Normalizer instance armed with tokenization ruleset)
 new_ruleset = [sic.ReplaceToken('from', 'to'), sic.SplitToken('token', 'r')]
 new_ruleset_string = ''.join([rule.decode() for rule in new_ruleset])
