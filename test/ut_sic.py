@@ -883,6 +883,7 @@ class TestNormalizer(unittest.TestCase):
         test_string7 = 'Halfsplitted Is Incorrect'; expected7 = 'Halfsplit Is Correct'; normalized7 = worker.normalize(test_string7, normalizer_option=3)
         test_string8 = 'Misspeling Is Incorrect'; expected8 = 'Misspelling Is Correct'; normalized8 = worker.normalize(test_string8, normalizer_option=3)
         test_string9 = 'Misspeling'; expected9 = 'Misspelling'; normalized9 = worker.normalize(test_string9, normalizer_option=3)
+        test_string10 = 'Incorrect'; expected10 = 'Correct'; normalized10 = worker.normalize(test_string10, normalizer_option=3)
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
         assert expected3 == normalized3, 'Expected "%s", got "%s".' % (expected3, normalized3)
@@ -892,6 +893,7 @@ class TestNormalizer(unittest.TestCase):
         assert expected7 == normalized7, 'Expected "%s", got "%s".' % (expected7, normalized7)
         assert expected8 == normalized8, 'Expected "%s", got "%s".' % (expected8, normalized8)
         assert expected9 == normalized9, 'Expected "%s", got "%s".' % (expected9, normalized9)
+        assert expected10 == normalized10, 'Expected "%s", got "%s".' % (expected10, normalized10)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
