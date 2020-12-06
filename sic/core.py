@@ -509,8 +509,8 @@ class Normalizer():
         on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
         if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
             # now buffer has token to be replaced
-            buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
-            separators[1] = 1
+            buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) # + word_separator #if not buffer.endswith(word_separator) else ''
+            #separators[1] = 1
             b_map = [b_map[0] for i in range(len(buffer))]
             last_buffer = ''
             last_separators[0], last_separators[1] = 0, 0
@@ -530,7 +530,7 @@ class Normalizer():
                     separator_index.add(len(this_fragment))
         if on_the_left and this_fragment[-1:] != word_separator:
             this_fragment += word_separator
-            separator_index.add(len(this_fragment) + 1)
+            if separators[1]: separator_index.add(len(this_fragment) + 1)
             f_map.append(total_length - 1)
         if this_fragment.endswith(word_separator) and buffer.startswith(word_separator):
             f_map.pop()

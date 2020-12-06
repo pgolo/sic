@@ -874,6 +874,7 @@ class TestNormalizer(unittest.TestCase):
     def test_spelling_correction(self):
         builder = sic.Builder()
         worker = builder.build_normalizer('%s/tokenizer_spelling_ci.xml' % (self.assets_dir))
+        worker2 = builder.build_normalizer()
         test_string1 = '123speling-Is-Corrected'; expected1 = '123spelling-Is-Corrected'; normalized1 = worker.normalize(test_string1, normalizer_option=3)
         test_string2 = '123Speling-Is-Corrected'; expected2 = '123Spelling-Is-Corrected'; normalized2 = worker.normalize(test_string2, normalizer_option=3)
         test_string3 = '123SPELING-Is-Corrected'; expected3 = '123SPELLING-Is-Corrected'; normalized3 = worker.normalize(test_string3, normalizer_option=3)
@@ -884,6 +885,8 @@ class TestNormalizer(unittest.TestCase):
         test_string8 = 'Misspeling Is Incorrect'; expected8 = 'Misspelling Is Correct'; normalized8 = worker.normalize(test_string8, normalizer_option=3)
         test_string9 = 'Misspeling'; expected9 = 'Misspelling'; normalized9 = worker.normalize(test_string9, normalizer_option=3)
         test_string10 = 'Incorrect'; expected10 = 'Correct'; normalized10 = worker.normalize(test_string10, normalizer_option=3)
+        test_string11 = 'Do Not, don''t Correct Me'; expected11 = 'Do Not, don''t Correct Me'; normalized11 = worker.normalize(test_string11, normalizer_option=3)
+        test_string12 = 'Alpha-2-macroglobulin'; expected12 = 'Alpha-2-macroglobulin'; normalized12 = worker2.normalize(test_string12, normalizer_option=3)
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
         assert expected3 == normalized3, 'Expected "%s", got "%s".' % (expected3, normalized3)
@@ -894,6 +897,8 @@ class TestNormalizer(unittest.TestCase):
         assert expected8 == normalized8, 'Expected "%s", got "%s".' % (expected8, normalized8)
         assert expected9 == normalized9, 'Expected "%s", got "%s".' % (expected9, normalized9)
         assert expected10 == normalized10, 'Expected "%s", got "%s".' % (expected10, normalized10)
+        assert expected11 == normalized11, 'Expected "%s", got "%s".' % (expected11, normalized11)
+        assert expected12 == normalized12, 'Expected "%s", got "%s".' % (expected12, normalized12)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
