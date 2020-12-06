@@ -546,9 +546,9 @@ class Normalizer():
             f_map = f_map[len(word_separator):]
             # This approach works, but this straightforward reindexing seems ugly
             separator_index_tmp = set()
-            for x in separator_index:
-                if x > 0:
-                    separator_index_tmp.add(x-1)
+            for idx in separator_index:
+                if idx > 0:
+                    separator_index_tmp.add(idx-1)
             separator_index = separator_index_tmp
             # ^^^
         while this_fragment.endswith(word_separator):

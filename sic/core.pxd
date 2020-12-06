@@ -131,9 +131,11 @@ cdef class Normalizer():
         separators=cython.list,
         last_separators=cython.list,
         separator_index=cython.set,
+        separator_index_tmp=cython.set,
         normalized=cython.str,
         i=cython.int,
-        x=cython.str
+        x=cython.str,
+        idx=cython.int
     )
     cpdef str normalize(
         self,
