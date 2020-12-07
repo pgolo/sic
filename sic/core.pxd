@@ -128,14 +128,10 @@ cdef class Normalizer():
         on_the_left=cython.bint,
         on_the_right=cython.bint,
         added_separator=cython.bint,
-        separators=cython.list,
-        last_separators=cython.list,
-        separator_index=cython.set,
-        separator_index_tmp=cython.set,
+        inserted_separator=cython.str,
         normalized=cython.str,
         i=cython.int,
-        x=cython.str,
-        idx=cython.int
+        x=cython.str
     )
     cpdef str normalize(
         self,

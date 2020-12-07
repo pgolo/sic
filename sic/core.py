@@ -363,9 +363,10 @@ class Normalizer():
         on_the_left = True
         on_the_right = False
         added_separator = False
-        separators = [0, 0]
-        last_separators = [0, 0]
-        separator_index = set()
+        #separators = [0, 0]
+        #last_separators = [0, 0]
+        #separator_index = set()
+        inserted_separator = '$'
         while current_index < total_length:
             character, original_character = parsed_string[current_index], original_string[current_index]
             if character in self.content['_chmap']:
@@ -374,11 +375,11 @@ class Normalizer():
             this_group = self.chargroup(character)
             on_the_right = False
             added_separator = False
-            if character != word_separator and last_character != word_separator:
+            if character not in (word_separator, inserted_separator) and last_character not in (word_separator, inserted_separator):
                 if this_group == 0 or this_group != last_group:
-                    if not buffer.endswith(word_separator):
-                        buffer += word_separator
-                        separators[1] = 1
+                    if not buffer.endswith(word_separator) and not buffer.endswith(inserted_separator):
+                        buffer += inserted_separator
+                        #separators[1] = 1
                         if len(b_map) == len(buffer):
                             b_map[-1] = current_index
                         else:
@@ -391,85 +392,84 @@ class Normalizer():
                 temp_index, temp_buffer, t_map = current_index, buffer, list(b_map)
             if character in subtrie:
                 if not began_reading:
-                    if on_the_left and this_fragment and this_fragment[-1:] != word_separator:
-                        this_fragment += word_separator
-                        separator_index.add(len(this_fragment) - 1)
+                    if on_the_left and this_fragment and this_fragment[-1:] not in (word_separator, inserted_separator):
+                        this_fragment += inserted_separator
+                        #separator_index.add(len(this_fragment) - 1)
                         if len(f_map) == len(this_fragment):
                             f_map[-1] = current_index
                         else:
                             f_map.append(current_index)
-                    if this_fragment.endswith(word_separator) and buffer.startswith(word_separator):
+                    if (this_fragment.endswith(word_separator) or this_fragment.endswith(inserted_separator)) and (buffer.startswith(word_separator) or buffer.startswith(inserted_separator)):
                         f_map.pop()
                         this_fragment = this_fragment[:-1]
                     f_map += b_map
-                    if separators[0]:
-                        separator_index.add(len(this_fragment))
+                    #if separators[0]:
+                    #    separator_index.add(len(this_fragment))
                     this_fragment += buffer
-                    if separators[1]:
-                        separator_index.add(len(this_fragment) - 1)
-                        #separator_index.add(current_index + 1)
+                    #if separators[1]:
+                    #    separator_index.add(len(this_fragment) - 1)
                     buffer = ''
-                    separators[0], separators[1] = 0, 0
+                    #separators[0], separators[1] = 0, 0
                     b_map = []
-                on_the_left = on_the_left or added_separator or last_character == word_separator
+                on_the_left = on_the_left or added_separator or last_character in (word_separator, inserted_separator)
                 began_reading = True
                 subtrie = subtrie[character]
                 buffer += original_character
                 b_map += [current_index for x in character]
             else:
-                on_the_right = on_the_right or character == word_separator
-                on_the_left = not this_fragment or this_fragment[-1:] == word_separator
+                on_the_right = on_the_right or character in (word_separator, inserted_separator)
+                on_the_left = not this_fragment or this_fragment[-1:] in (word_separator, inserted_separator)
                 began_reading = False
                 # check what's in the buffer, and do the right thing
                 if '~_' in subtrie:
                     # we may need to apply this replacement in future, so keep buffer value and subtrie['~_']
                     last_buffer = buffer
-                    last_separators[0], last_separators[1] = separators[0], separators[1]
+                    #last_separators[0], last_separators[1] = separators[0], separators[1]
                     last_replacement = self.align_case(subtrie['~_'], last_buffer, normalizer_option)
                     l_map = [b_map[0] for i in range(len(last_replacement))]
                 if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
                     # now buffer has token to be replaced
-                    buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) + word_separator #if not buffer.endswith(word_separator) else ''
-                    separators[1] = 1 if parsed_string[current_index] != word_separator else 0
+                    buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) + inserted_separator #if not buffer.endswith(word_separator) else ''
+                    #separators[1] = 1 if parsed_string[current_index] != word_separator else 0
                     b_map = [b_map[0] for i in range(len(buffer))]
                     last_buffer = ''
-                    last_separators[0], last_separators[1] = 0, 0
+                    #last_separators[0], last_separators[1] = 0, 0
                     l_map = []
                     temp_index = -1
                     # now buffer has replaced token
                 if '~l' in subtrie and on_the_left:
-                    if not buffer.endswith(word_separator):
-                        buffer += word_separator
-                        separators[1] = 1
+                    if not buffer.endswith(word_separator) and not buffer.endswith(inserted_separator):
+                        buffer += inserted_separator
+                        #separators[1] = 1
                         if len(b_map) == len(buffer):
                             b_map[-1] = current_index
                         else:
                             b_map.append(current_index)
                     temp_index = -1
                 if '~m' in subtrie and not on_the_left and not on_the_right:
-                    if not buffer.startswith(word_separator):
-                        buffer = word_separator + buffer
-                        separators[0] = 1
+                    if not buffer.startswith(word_separator) and not buffer.startswith(inserted_separator):
+                        buffer = inserted_separator + buffer
+                        #separators[0] = 1
                         b_map.insert(0, current_index)
-                    if not buffer.endswith(word_separator):
-                        buffer += word_separator
-                        separators[1] = 1
+                    if not buffer.endswith(word_separator) and not buffer.endswith(inserted_separator):
+                        buffer += inserted_separator
+                        #separators[1] = 1
                         if len(b_map) == len(buffer):
                             b_map[-1] = current_index
                         else:
                             b_map.append(current_index)
                     if last_buffer:
                         f_map = f_map[:-len(last_buffer)] + l_map
-                        if last_separators[0]:
-                            separator_index.add(len(this_fragment))
+                        #if last_separators[0]:
+                        #    separator_index.add(len(this_fragment))
                         this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
-                        if last_separators[1]:
-                            separator_index.add(len(this_fragment) - 1)
+                        #if last_separators[1]:
+                        #    separator_index.add(len(this_fragment) - 1)
                     temp_index = -1
                 if '~r' in subtrie and on_the_right:
-                    if not buffer.startswith(word_separator):
-                        buffer = word_separator + buffer
-                        separators[0] = 1
+                    if not buffer.startswith(word_separator) and not buffer.startswith(inserted_separator):
+                        buffer = inserted_separator + buffer
+                        #separators[0] = 1
                         b_map.insert(0, current_index)
                     temp_index = -1
                 subtrie = self.content
@@ -477,28 +477,28 @@ class Normalizer():
                     current_index, buffer, b_map = temp_index, temp_buffer, list(t_map) # plain jumping back which causes performance hit, think about better solution
                     temp_index, temp_buffer, t_map = -1, '', []
                     continue
-                if on_the_left and this_fragment and this_fragment[-1:] != word_separator and character != word_separator and not added_separator:
-                    this_fragment += word_separator
-                    separator_index.add(len(this_fragment))
+                if on_the_left and this_fragment and this_fragment[-1:] not in (word_separator, inserted_separator) and character not in (word_separator, inserted_separator) and not added_separator:
+                    this_fragment += inserted_separator
+                    #separator_index.add(len(this_fragment))
                     if len(f_map) == len(this_fragment):
                         f_map[-1] = current_index
                     else:
                         f_map.append(current_index)
-                if this_fragment.endswith(word_separator) and buffer.startswith(word_separator):
+                if (this_fragment.endswith(word_separator) or this_fragment.endswith(inserted_separator)) and (buffer.startswith(word_separator) or buffer.startswith(inserted_separator)):
                     f_map.pop()
                     this_fragment = this_fragment[:-1]
                 f_map += b_map
-                if separators[0]:
-                    separator_index.add(len(this_fragment))
+                #if separators[0]:
+                #    separator_index.add(len(this_fragment))
                 this_fragment += buffer
-                if separators[1]:
-                    separator_index.add(len(this_fragment) - 1)
+                #if separators[1]:
+                #    separator_index.add(len(this_fragment) - 1)
                 buffer = original_character
-                separators[0], separators[1] = 0, 0
+                #separators[0], separators[1] = 0, 0
                 b_map = [current_index for x in character]
                 on_the_left = False
                 if character in self.content:
-                    on_the_left = added_separator or last_character == word_separator
+                    on_the_left = added_separator or last_character in (word_separator, inserted_separator)
                     began_reading = True
                     subtrie = self.content[character]
             last_group = this_group
@@ -507,61 +507,63 @@ class Normalizer():
         # check what's in the buffer, and do the right thing
         # DRY!
         on_the_right = True
-        on_the_left = this_fragment == '' or this_fragment[-1:] == word_separator
+        on_the_left = this_fragment == '' or this_fragment[-1:] in (word_separator, inserted_separator)
         if '~_' in subtrie and ((on_the_left and on_the_right) or '~m' in subtrie or ('~l' in subtrie and on_the_left) or ('~r' in subtrie and on_the_right)):
             # now buffer has token to be replaced
             buffer = self.align_case(subtrie['~_'], buffer, normalizer_option) # + word_separator #if not buffer.endswith(word_separator) else ''
             #separators[1] = 1
             b_map = [b_map[0] for i in range(len(buffer))]
             last_buffer = ''
-            last_separators[0], last_separators[1] = 0, 0
+            #last_separators[0], last_separators[1] = 0, 0
             l_map = []
             # now buffer has replaced token
         if '~r' in subtrie and on_the_right:
-            if not buffer.startswith(word_separator):
+            if not buffer.startswith(word_separator) and not buffer.startswith(inserted_separator):
                 buffer = word_separator + buffer
-                separators[0] = 1
+                #separators[0] = 1
                 b_map.insert(0, total_length - 1)
             if last_buffer:
                 f_map += l_map
-                if last_separators[0]:
-                    separator_index.add(len(this_fragment))
+                #if last_separators[0]:
+                #    separator_index.add(len(this_fragment))
                 this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
-                if last_separators[1]:
-                    separator_index.add(len(this_fragment))
-        if on_the_left and this_fragment[-1:] != word_separator:
-            this_fragment += word_separator
-            if separators[1]: separator_index.add(len(this_fragment) + 1)
+                #if last_separators[1]:
+                #    separator_index.add(len(this_fragment))
+        if on_the_left and this_fragment[-1:] not in (word_separator, inserted_separator):
+            this_fragment += inserted_separator
+            #if separators[1]: separator_index.add(len(this_fragment) + 1)
             f_map.append(total_length - 1)
-        if this_fragment.endswith(word_separator) and buffer.startswith(word_separator):
+        if (this_fragment.endswith(word_separator) or this_fragment.endswith(inserted_separator)) and (buffer.startswith(word_separator) or buffer.startswith(inserted_separator)):
             f_map.pop()
             this_fragment = this_fragment[:-1]
         f_map += b_map
-        if separators[0]:
-            separator_index.add(len(this_fragment))
+        #if separators[0]:
+        #    separator_index.add(len(this_fragment))
         this_fragment += buffer
-        if last_separators[1]:
-            separator_index.add(len(this_fragment) - 1)
-        while this_fragment.startswith(word_separator):
+        #if last_separators[1]:
+        #    separator_index.add(len(this_fragment) - 1)
+        while this_fragment.startswith(word_separator) or this_fragment.startswith(inserted_separator):
             this_fragment = this_fragment[len(word_separator):]
             f_map = f_map[len(word_separator):]
             # This approach works, but this straightforward reindexing seems ugly
-            separator_index_tmp = set()
-            for idx in separator_index:
-                if idx > 0:
-                    separator_index_tmp.add(idx-1)
-            separator_index = separator_index_tmp
+            #separator_index_tmp = set()
+            #for idx in separator_index:
+            #    if idx > 0:
+            #        separator_index_tmp.add(idx-1)
+            #separator_index = separator_index_tmp
             # ^^^
-        while this_fragment.endswith(word_separator):
+        while this_fragment.endswith(word_separator) or this_fragment.endswith(inserted_separator):
             this_fragment = this_fragment[:-len(word_separator)]
             f_map = f_map[:-len(word_separator)]
         normalized = this_fragment
+        if normalizer_option == 3:
+            normalized = normalized.replace(inserted_separator, '')
+        else:
+            normalized = normalized.replace(inserted_separator, word_separator)
         if normalizer_option == 1:
-            normalized = word_separator.join(sorted(this_fragment.split(word_separator)))
+            normalized = word_separator.join(sorted(normalized.split(word_separator)))
         elif normalizer_option == 2:
-            normalized = word_separator.join(sorted(set(this_fragment.split(word_separator))))
-        elif normalizer_option == 3:
-            normalized = ''.join([this_fragment[i] for i in range(len(this_fragment)) if i not in separator_index])
+            normalized = word_separator.join(sorted(set(normalized.split(word_separator))))
         elif len(f_map) > 0 and normalizer_option == 0:
             f_map[-1] = total_length - 1
             self.normalizer_result['map'] = f_map
