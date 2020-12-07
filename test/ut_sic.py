@@ -887,6 +887,8 @@ class TestNormalizer(unittest.TestCase):
         test_string10 = 'Incorrect'; expected10 = 'Correct'; normalized10 = worker.normalize(test_string10, normalizer_option=3)
         test_string11 = 'Do Not, don''t Correct Me'; expected11 = 'Do Not, don''t Correct Me'; normalized11 = worker.normalize(test_string11, normalizer_option=3)
         test_string12 = 'Alpha-2-macroglobulin'; expected12 = 'Alpha-2-macroglobulin'; normalized12 = worker2.normalize(test_string12, normalizer_option=3)
+        test_string13 = 'Alpha 1B-glycoprotein'; expected13 = 'Alpha 1B-glycoprotein'; normalized13 = worker2.normalize(test_string13, normalizer_option=3)
+        test_string14 = 'Alpha 1B-glycoprotein'; expected14 = 'Alpha 1B-glycoprotein'; normalized14 = worker.normalize(test_string14, normalizer_option=3)
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
         assert expected3 == normalized3, 'Expected "%s", got "%s".' % (expected3, normalized3)
@@ -899,6 +901,8 @@ class TestNormalizer(unittest.TestCase):
         assert expected10 == normalized10, 'Expected "%s", got "%s".' % (expected10, normalized10)
         assert expected11 == normalized11, 'Expected "%s", got "%s".' % (expected11, normalized11)
         assert expected12 == normalized12, 'Expected "%s", got "%s".' % (expected12, normalized12)
+        assert expected13 == normalized13, 'Expected "%s", got "%s".' % (expected13, normalized13)
+        assert expected14 == normalized14, 'Expected "%s", got "%s".' % (expected14, normalized14)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
