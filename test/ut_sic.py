@@ -889,6 +889,7 @@ class TestNormalizer(unittest.TestCase):
         test_string12 = 'Alpha-2-macroglobulin'; expected12 = 'Alpha-2-macroglobulin'; normalized12 = worker2.normalize(test_string12, normalizer_option=3)
         test_string13 = 'Alpha 1B-glycoprotein'; expected13 = 'Alpha 1B-glycoprotein'; normalized13 = worker2.normalize(test_string13, normalizer_option=3)
         test_string14 = 'Alpha 1B-glycoprotein'; expected14 = 'Alpha 1B-glycoprotein'; normalized14 = worker.normalize(test_string14, normalizer_option=3)
+        test_string15 = 'AI3-05966'; expected15 = 'AI3-05966'; normalized15 = worker2.normalize(test_string15, normalizer_option=3)
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
         assert expected3 == normalized3, 'Expected "%s", got "%s".' % (expected3, normalized3)
