@@ -907,7 +907,7 @@ class TestNormalizer(unittest.TestCase):
         assert expected15 == normalized15, 'Expected "%s", got "%s".' % (expected15, normalized15)
 
     def test_spelling_correction_implicit(self):
-        sic.build_normalizer('%s/.tokenizer.spelling.xml' % (self.assets_dir))
+        sic.build_normalizer('%s/tokenizer_spelling_ci.xml' % (self.assets_dir))
         test_string1 = 'AI3-05966'; expected1 = 'AI3-05966'; normalized1 = sic.normalize(test_string1, normalizer_option=3)
         sic.build_normalizer()
         test_string2 = 'AI3-05966'; expected2 = 'AI3-05966'; normalized2 = sic.normalize(test_string2, normalizer_option=3)
