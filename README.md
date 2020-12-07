@@ -315,12 +315,13 @@ data structure in `sic.Normalizer` instance.
 according to the rules ingested at the time of class initialization, and
 returns normalized string.
 
-|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION             |
-|:-----------------:|:----:|:-------:|:----------------------------------:|
-| source_string     | str  |   n/a   | String to normalize.               |
-| word_separator    | str  |   ' '   | Word delimiter (single character). |
-| normalizer_option | int  |    0    | Mode of post-processing.           |
-|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION                              |
+|:-----------------:|:----:|:-------:|:---------------------------------------------------:|
+| source_string     | str  |   n/a   | String to normalize.                                |
+| word_separator    | str  |   ' '   | Word delimiter (single character).                  |
+| normalizer_option | int  |    0    | Mode of post-processing.                            |
+| control_character | str  | '\x00'  | Character masking word delimiter (single character) |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 `word_separator`: Specified character will be considered a boundary between
 tokens. The default value is `' '` (space) which seems reasonable choice for
@@ -337,6 +338,11 @@ controls the way tokenized string is post-processed:
 |   2   | Rearrange tokens in alphabetical order and remove duplicates. |
 |   3   | Remove all added word separators.                             |
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+`control_character`: Implementation detail - character that used as word
+delimiter inserted in a parsed string at the run time. If parsed string
+initially included this character somewhere, normalization will return error.
+The value is set to `\x00` by default.
 
 **Property** `sic.Normalizer.result` retains the result of last call for
 `sic.Normalizer.normalize` function as dict object with the following keys:
@@ -387,13 +393,14 @@ for `sic.Normalizer.load()` function.
 instantly creates new local `sic.Normalizer` class, and uses it to perform
 requested string normalization.
 
-|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION                |
-|:-----------------:|:----:|:-------:|:-------------------------------------:|
-| source_string     | str  |   n/a   | String to normalize.                  |
-| word_separator    | str  |   ' '   | Word delimiter (single character).    |
-| normalizer_option | int  |    0    | Mode of post-processing.              |
-| tokenizer_config  | str  |  None   | Path to tokenizer configuration file. |
-||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+|     ARGUMENT      | TYPE | DEFAULT |            DESCRIPTION                              |
+|:-----------------:|:----:|:-------:|:---------------------------------------------------:|
+| source_string     | str  |   n/a   | String to normalize.                                |
+| word_separator    | str  |   ' '   | Word delimiter (single character).                  |
+| normalizer_option | int  |    0    | Mode of post-processing.                            |
+| control_character | str  | '\x00'  | Character masking word delimiter (single character) |
+| tokenizer_config  | str  |  None   | Path to tokenizer configuration file.               |
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 If `tokenizer_config` argument is not provided, the function will use global
 instance of `sic.Normalizer` class (will create it if it is not initialized).
