@@ -906,6 +906,14 @@ class TestNormalizer(unittest.TestCase):
         assert expected14 == normalized14, 'Expected "%s", got "%s".' % (expected14, normalized14)
         assert expected15 == normalized15, 'Expected "%s", got "%s".' % (expected15, normalized15)
 
+    def test_spelling_correction_implicit(self):
+        sic.build_normalizer('%s/.tokenizer.spelling.xml' % (self.assets_dir))
+        test_string1 = 'AI3-05966'; expected1 = 'AI3-05966'; normalized1 = sic.normalize(test_string1, normalizer_option=3)
+        sic.build_normalizer()
+        test_string2 = 'AI3-05966'; expected2 = 'AI3-05966'; normalized2 = sic.normalize(test_string2, normalizer_option=3)
+        assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
+        assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
+
 if __name__ == '__main__':
     sys.path.insert(0, '')
     import sic # pylint: disable=E0611,F0401

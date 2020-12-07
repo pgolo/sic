@@ -407,6 +407,7 @@ class Normalizer():
                     this_fragment += buffer
                     if separators[1]:
                         separator_index.add(len(this_fragment) - 1)
+                        #separator_index.add(current_index + 1)
                     buffer = ''
                     separators[0], separators[1] = 0, 0
                     b_map = []
