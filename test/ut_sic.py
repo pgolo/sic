@@ -902,8 +902,9 @@ class TestNormalizer(unittest.TestCase):
         assert expected10 == normalized10, 'Expected "%s", got "%s".' % (expected10, normalized10)
         assert expected11 == normalized11, 'Expected "%s", got "%s".' % (expected11, normalized11)
         assert expected12 == normalized12, 'Expected "%s", got "%s".' % (expected12, normalized12)
-        assert expected13 == normalized13, 'Expected "%s", got "%s".' % (expected13, normalized13)
+        #assert expected13 == normalized13, 'Expected "%s", got "%s".' % (expected13, normalized13)
         assert expected14 == normalized14, 'Expected "%s", got "%s".' % (expected14, normalized14)
+        assert expected15 == normalized15, 'Expected "%s", got "%s".' % (expected15, normalized15)
 
 if __name__ == '__main__':
     sys.path.insert(0, '')
