@@ -128,9 +128,6 @@ cdef class Normalizer():
         on_the_left=cython.bint,
         on_the_right=cython.bint,
         added_separator=cython.bint,
-        separators=cython.list,
-        last_separators=cython.list,
-        separator_index=cython.set,
         normalized=cython.str,
         i=cython.int,
         x=cython.str
@@ -139,7 +136,8 @@ cdef class Normalizer():
         self,
         str source_string,
         str word_separator=*,
-        int normalizer_option=*
+        int normalizer_option=*,
+        str control_character=*
     )
 
     cpdef save(
