@@ -258,7 +258,7 @@ model.add_rule(sic.ReplaceCharacter('a', 'z'))
 > "bad" --> "good" will not be used; "bad" --> "better" will be used instead
 
 **Method** `sic.Model.remove_rule` removes single tokenization instruction from
-Model instance if is there:
+Model instance if it is there:
 
 ```python
 model.remove_rule(sic.ReplaceToken('bad', 'good'))
