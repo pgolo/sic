@@ -5,6 +5,10 @@
   <token from="def" to="ghi" />
   <token from="ghi" to="jkl" />
   <token from="mmm" to="nnn" />
+  <token from="qwe" to="rty" />
+  <token from="qwe" to="uiop" />
+  <token from="rty" to="uiop" />
+  <token from="abc" to="jkl" />
   <character from="z" to="y" />
   <character from="y" to="x" />
   <character from="x" to="w" />
