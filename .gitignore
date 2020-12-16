@@ -12,3 +12,4 @@ sic.egg-info/*
 sic/core.c
 !**/.gitkeep
 !**/.gitignore
+!.github/*
