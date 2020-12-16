@@ -32,4 +32,5 @@ jobs:
       run: |
         python3 test/ut_sic.py
     - name: Performance assessment
+      run: |
         python3 test/performance.py
