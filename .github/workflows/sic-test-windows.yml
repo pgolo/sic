@@ -25,9 +25,9 @@ jobs:
       run: |
         python test\compile.py build_ext --inplace
         mkdir bin
-        move /Y sic\*.pyd bin\
-        copy /Y sic\__init__.py bin\
-        copy /Y sic\*.xml bin\
+        move sic\*.pyd bin
+        copy sic\__init__.py bin
+        copy sic\*.xml bin
     - name: Unit tests
       run: |
         python test\ut_sic.py
