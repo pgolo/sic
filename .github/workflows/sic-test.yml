@@ -29,4 +29,5 @@ jobs:
         cp sic/__init__.py bin
         cp sic/*.xml bin
     - name: Test
+      run: |
         python3 test/ut_sic.py
