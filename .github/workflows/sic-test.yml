@@ -1,4 +1,4 @@
-name: sic-test
+name: sic-test-linux
 
 on:
   workflow_dispatch
@@ -31,3 +31,4 @@ jobs:
     - name: Test
       run: |
         python3 test/ut_sic.py
+        python3 test/performance.py
