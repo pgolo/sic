@@ -1,4 +1,4 @@
-name: sic
+name: sic-test
 
 on:
   workflow_dispatch
@@ -21,7 +21,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    - name: Test
+    - name: Cythonize
       run: |
-        scripts/linux/buildso.sh
-        scripts/linux/testing.sh
+        python3 test/compile.py build_ext --inplace
+        mkdir bin
+        mv sic/*.so bin
+        cp sic/__init__.py bin
+        cp sic/*.xml bin
+    - name: Test
+        python3 test/ut_sic.py
