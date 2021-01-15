@@ -33,11 +33,15 @@ cdef class Normalizer():
     cdef public dict content
     cdef public dict normalizer_result
 
+    @cython.locals(
+        next_nodes=cython.set
+    )
     cpdef str expand_instruction(
         self,
         dict g,
-        str node,
-        set visited
+        str seed,
+        set nodes=*,
+        int hops=*
     )
 
     @cython.locals(
