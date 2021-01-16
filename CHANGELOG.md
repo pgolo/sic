@@ -11,11 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Improved logical reasoning to resolve conflicting instructions
+
 ### Removed
 
 ## [1.3.1] - 2020-12-08
 
 ### Changed
+
 - Updated logic with respect to spelling correction
 
 ## [1.3.0] - 2020-11-30
