@@ -36,7 +36,7 @@ cdef class Normalizer():
     @cython.locals(
         next_nodes=cython.set
     )
-    cpdef str expand_instruction(
+    cpdef set expand_instruction(
         self,
         dict g,
         str seed,
@@ -50,7 +50,8 @@ cdef class Normalizer():
         line=cython.str,
         action=cython.str,
         parameter=cython.str,
-        subject=cython.str
+        subject=cython.str,
+        node=cython.str
     )
     cpdef str merge_replacements(
         self,

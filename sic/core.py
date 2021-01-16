@@ -132,7 +132,7 @@ class Normalizer():
         For a directed graph *g*, it is assumed that each node has at most 1 descendant.
 
         Args:
-            *g* is a dict(str, str) representing a graph
+            *g* is a dict(str, set) representing a graph
             *seed* is a node (str) to expand
             *nodes* is a set of nodes on the way of expansion
             *hops* is depth of expansion so far
