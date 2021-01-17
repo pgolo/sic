@@ -5,85 +5,93 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [X.X.X] - XXXX-XX-XX
+## sic 1.3
 
-### Added
+### [X.X.X] - XXXX-XX-XX
 
-### Changed
+#### Added
+
+#### Changed
 
 - Improved logical reasoning to resolve conflicting instructions
 
-### Removed
+#### Removed
 
-## [1.3.1] - 2020-12-08
+### [1.3.1] - 2020-12-08
 
-### Changed
+#### Changed
 
 - Updated logic with respect to spelling correction
 
-## [1.3.0] - 2020-11-30
+### [1.3.0] - 2020-11-30
 
-### Added
+#### Added
 
 - Support for transitivity in tokenization rules
 - Option to identify tokens but don't add word separators to resulting string
 
-## [1.2.0] - 2020-11-09
+## sic 1.2
 
-### Added
+### [1.2.0] - 2020-11-09
+
+#### Added
 
 - Tokenization rules can be added to a compiled model
 
-## [1.1.0] - 2020-10-31
+## sic 1.1
 
-### Added
+### [1.1.0] - 2020-10-31
+
+#### Added
 
 - Implicit instantiation of core classes
 - Classes and function for ad hoc creation of tokenization config
 - Methods to save (pickle) and load (unpickle) compiled Normalizer instance
 - Wheel for Python 3.9
 
-## [1.0.6] - 2020-09-10
+## sic 1.0
 
-### Changed
+### [1.0.6] - 2020-09-10
+
+#### Changed
 
 - Fixed bug with replacing substring that is not a token
 
-## [1.0.5] - 2020-09-08
+### [1.0.5] - 2020-09-08
 
-### Changed
+#### Changed
 
 - Normalizer.data is now exposed as a property
 - Updated documentation, added performance benchmarks
 - Installable package is either pure Python or wheel with precompiled Cython
 
-## [1.0.4] - 2020-09-03
+### [1.0.4] - 2020-09-03
 
-### Added
+#### Added
 
 - Normalizer.result['r_map'] attribute
 - Scripts to build wheels
 
-## [1.0.3] - 2020-07-30
+### [1.0.3] - 2020-07-30
 
-### Added
+#### Added
 
 - Normalizer.data attribute is now exposed and can be accessed directly
 
-## [1.0.2] - 2020-06-12
+### [1.0.2] - 2020-06-12
 
-### Added
+#### Added
 
 - Added README.md in released package
 
-## [1.0.1] - 2020-06-12
+### [1.0.1] - 2020-06-12
 
-### Added
+#### Added
 
 - Module is cythonized at the time of installation
 
-## [1.0.0] - 2020-06-12
+### [1.0.0] - 2020-06-12
 
-### Added
+#### Added
 
 - Configurable string normalization module
