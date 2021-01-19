@@ -1,7 +1,7 @@
 @echo off
 set RUNDIR=%cd%
 set ROOT=%~dp0..\..
-set ENV=.env.39
+set ENV=.env.37
 set SRC=%ROOT%\sic
 set DIST=%ROOT%\bin
 set TEST=%ROOT%\test
