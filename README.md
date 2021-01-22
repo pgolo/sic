@@ -203,7 +203,10 @@ Transformation is applied in the following order:
 2. Splitting tokens
 3. Replacing tokens
 
-When splitting tokens, longer ones shadow shorter ones.
+When splitting tokens, longer ones shadow shorter ones. Token replacement
+instructions may contradict each other locally, but in entire set they must
+converge so that each token has only one replacement option (otherwise
+ValueError exception will be thrown).
 
 ## Usage
 

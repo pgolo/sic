@@ -9,7 +9,7 @@ with open('README.md', mode='r', encoding='utf8') as f:
 
 setup(
     name='sic',
-    version='X.X.X',
+    version='1.3.2',
     description='Utility for string normalization',
     long_description=long_description,
     long_description_content_type='text/markdown',
