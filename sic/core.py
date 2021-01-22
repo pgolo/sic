@@ -127,21 +127,27 @@ class Normalizer():
     def data(self, obj):
         self.content = obj
 
-    def expand_instruction(self, g, node, visited):
-        """Helper function that traverses a path and returns terminal node.
+    def expand_instruction(self, g, seed, nodes=set(), hops=0):
+        """Helper function that traverses a path and returns set of terminal nodes.
         For a directed graph *g*, it is assumed that each node has at most 1 descendant.
 
         Args:
-            *g* is a dict(str, str) representing a graph
-            *node* is starting node
-            *visited* is a set to keep visited nodes for cycle detection
+            *g* is a dict(str, set) representing a graph
+            *seed* is a node (str) to expand
+            *nodes* is a set of nodes on the way of expansion
+            *hops* is depth of expansion so far
         """
-        if node in visited:
-            raise RecursionError('Circular reference in replacement instruction regarding "%s"' % (node))
-        visited.add(node)
-        if node in g:
-            node = self.expand_instruction(g, g[node], visited)
-        return node
+        next_nodes = set()
+        if hops == 0:
+            nodes = {seed}
+        elif seed in nodes:
+            raise RecursionError('Circular reference in replacement instruction regarding "%s"' % (seed))
+        for node in nodes:
+            if node in g:
+                next_nodes = next_nodes.union(self.expand_instruction(g, seed, g[node], hops + 1))
+            else:
+                next_nodes.add(node)
+        return next_nodes
 
     def merge_replacements(self, sdata):
         """This function takes *sdata* config string, merges classes of "c" and "r" tokenization rules,
@@ -159,15 +165,16 @@ class Normalizer():
                     if action not in replacements:
                         replacements[action] = dict()
                     if subject not in replacements[action]:
-                        replacements[action][subject] = parameter
-                    elif replacements[action][subject] != parameter:
-                        raise ValueError('Conflicting instruction: (replace "%s" --> "%s") vs (replace "%s" --> "%s")' % (subject, replacements[action][subject], subject, parameter))
+                        replacements[action][subject] = set()
+                    replacements[action][subject].add(parameter)
                     continue
             ret += '%s\n' % (line)
         for action in replacements:
             for node in replacements[action]:
-                replacements[action][node] = self.expand_instruction(replacements[action], node, set())
-                ret += '%s\t%s\t%s\n' % (action, replacements[action][node], node)
+                replacements[action][node] = self.expand_instruction(replacements[action], node)
+                if len(replacements[action][node]) > 1:
+                    raise ValueError('Conflicting instruction: (replace "%s" --> "%s") vs (replace "%s" --> "%s")' % (subject, replacements[action][subject], subject, parameter))
+                ret += '%s\t%s\t%s\n' % (action, next(iter(replacements[action][node])), node)
         return ret
 
     def update_str_with_chmap(self, value, chmap):
@@ -257,7 +264,7 @@ class Normalizer():
                     if character not in subtrie:
                         subtrie[character] = dict()
                     subtrie = subtrie[character]
-                if parameter_key:
+                if parameter_key != '':
                     for parameter_keylet in parameter_key:
                         subtrie[actions[action][parameter_keylet]] = parameter_value
                 else:
@@ -390,7 +397,7 @@ class Normalizer():
                 temp_index, temp_buffer, t_map = current_index, buffer, list(b_map)
             if character in subtrie:
                 if not began_reading:
-                    if on_the_left and this_fragment and this_fragment[-1:] not in (word_separator, control_character):
+                    if on_the_left and this_fragment != '' and this_fragment[-1:] not in (word_separator, control_character):
                         this_fragment += control_character
                         if len(f_map) == len(this_fragment):
                             f_map[-1] = current_index
@@ -410,7 +417,7 @@ class Normalizer():
                 b_map += [current_index for x in character]
             else:
                 on_the_right = on_the_right or character in (word_separator, control_character)
-                on_the_left = not this_fragment or this_fragment[-1:] in (word_separator, control_character)
+                on_the_left = this_fragment == '' or this_fragment[-1:] in (word_separator, control_character)
                 began_reading = False
                 # check what's in the buffer, and do the right thing
                 if '~_' in subtrie:
@@ -444,7 +451,7 @@ class Normalizer():
                             b_map[-1] = current_index
                         else:
                             b_map.append(current_index)
-                    if last_buffer:
+                    if last_buffer != '':
                         f_map = f_map[:-len(last_buffer)] + l_map
                         this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
                     temp_index = -1
@@ -458,7 +465,7 @@ class Normalizer():
                     current_index, buffer, b_map = temp_index, temp_buffer, list(t_map) # plain jumping back which causes performance hit, think about better solution
                     temp_index, temp_buffer, t_map = -1, '', []
                     continue
-                if on_the_left and this_fragment and this_fragment[-1:] not in (word_separator, control_character) and character not in (word_separator, control_character) and not added_separator:
+                if on_the_left and this_fragment != '' and this_fragment[-1:] not in (word_separator, control_character) and character not in (word_separator, control_character) and not added_separator:
                     this_fragment += control_character
                     if len(f_map) == len(this_fragment):
                         f_map[-1] = current_index
@@ -492,7 +499,7 @@ class Normalizer():
             if not buffer.startswith(word_separator) and not buffer.startswith(control_character):
                 buffer = word_separator + buffer
                 b_map.insert(0, total_length - 1)
-            if last_buffer:
+            if last_buffer != '':
                 f_map += l_map
                 this_fragment = this_fragment[:-len(last_buffer)] + last_replacement
         if on_the_left and this_fragment[-1:] not in (word_separator, control_character):
@@ -585,10 +592,10 @@ class Builder():
             dict *res* is initial dict with tokenization rules
             str *batch_name* is name of tokenizer
         """
-        result = res if res else {'name': filename if not batch_name else batch_name}
+        result = res if res else {'name': filename if batch_name == '' else batch_name}
         tree = et.parse(filename)
         root = tree.getroot()
-        if 'name' in root.attrib and not batch_name:
+        if 'name' in root.attrib and batch_name == '':
             result['name'] = root.attrib['name']
         import_elements = root.findall('./import')
         if import_elements:

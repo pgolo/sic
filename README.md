@@ -203,7 +203,10 @@ Transformation is applied in the following order:
 2. Splitting tokens
 3. Replacing tokens
 
-When splitting tokens, longer ones shadow shorter ones.
+When splitting tokens, longer ones shadow shorter ones. Token replacement
+instructions may contradict each other locally, but in entire set they must
+converge so that each token has only one replacement option (otherwise
+ValueError exception will be thrown).
 
 ## Usage
 
@@ -258,7 +261,7 @@ model.add_rule(sic.ReplaceCharacter('a', 'z'))
 > "bad" --> "good" will not be used; "bad" --> "better" will be used instead
 
 **Method** `sic.Model.remove_rule` removes single tokenization instruction from
-Model instance if is there:
+Model instance if it is there:
 
 ```python
 model.remove_rule(sic.ReplaceToken('bad', 'good'))
