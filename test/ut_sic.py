@@ -946,6 +946,15 @@ class TestNormalizer(unittest.TestCase):
         assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
         assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
 
+    def test_split_inside_replace(self):
+        model = sic.Model()
+        model.add_rule(sic.ReplaceToken('(P)', '[P]'))
+        sic.build_normalizer(model)
+        test_string1 = 'ab(c)'; expected1 = 'ab ( c )'; normalized1 = sic.normalize(test_string1)
+        test_string2 = 'ab(p)'; expected2 = 'ab [p]'; normalized2 = sic.normalize(test_string2)
+        assert expected1 == normalized1, 'Expected "%s", got "%s".' % (expected1, normalized1)
+        assert expected2 == normalized2, 'Expected "%s", got "%s".' % (expected2, normalized2)
+
 if __name__ == '__main__':
     sys.path.insert(0, '')
     import sic # pylint: disable=E0611,F0401
