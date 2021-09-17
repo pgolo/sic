@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## sic 1.3
 
+### [1.3.3] - 2021-09-17
+
+#### Changed
+
+- Fixed bug causing incorrect normalization when replacement tokens can be tokenized themselves
+
 ### [1.3.2] - 2021-01-21
 
 #### Changed

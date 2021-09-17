@@ -382,7 +382,7 @@ class Normalizer():
             on_the_right = False
             added_separator = False
             if character not in (word_separator, control_character) and last_character not in (word_separator, control_character):
-                if this_group == 0 or this_group != last_group:
+                if (this_group == 0 or this_group != last_group) and (subtrie is self.content or character not in subtrie):
                     if not buffer.endswith(word_separator) and not buffer.endswith(control_character):
                         buffer += control_character
                         if len(b_map) == len(buffer):
