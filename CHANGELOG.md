@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## sic 1.3
 
+### [X.X.X] - XXXX-XX-XX
+
+#### Added
+
+#### Changed
+
+#### Removed
+
 ### [1.3.3] - 2021-09-17
 
 #### Changed
