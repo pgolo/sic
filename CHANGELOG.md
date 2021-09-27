@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## sic 1.3
 
-### [X.X.X] - XXXX-XX-XX
+### [Unreleased] - XXXX-XX-XX
 
 #### Added
+
+- Improved standard normalization units
 
 #### Changed
 

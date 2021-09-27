@@ -126,7 +126,9 @@
   <character to="?" from="…" />
   <character to="?" from="‰" />
   <character to="&lt;" from="‹" />
+  <character to="&lt;" from="˂" />
   <character to="&gt;" from="›" />
+  <character to="&gt;" from="˃" />
   <character to="/" from="⁄" />
   <character to="n" from="ⁿ" />
   <character to="?" from="₧" />
