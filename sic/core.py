@@ -497,7 +497,7 @@ class Normalizer():
             l_map = []
         if '~r' in subtrie and on_the_right:
             if not buffer.startswith(word_separator) and not buffer.startswith(control_character):
-                buffer = word_separator + buffer
+                buffer = control_character + buffer
                 b_map.insert(0, total_length - 1)
             if last_buffer != '':
                 f_map += l_map
