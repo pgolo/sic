@@ -1,6 +1,6 @@
 @echo off
 rem Usage:
-rem buildwheel.bat path\to\python36 path\to\python37 path\to\python38 path\to\python39
+rem buildwheel.bat path\to\python36 path\to\python37 path\to\python38 path\to\python39 path\to\python310
 rem
 rem The package will be placed in dist\ directory.
 
