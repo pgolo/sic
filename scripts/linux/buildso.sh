@@ -2,7 +2,7 @@ RUNDIR=`pwd`
 cd `dirname $0`
 MYDIR=`pwd`
 ROOT=${MYDIR}/../..
-ENV=.env.36
+ENV=.env.310
 SRC=${ROOT}/sic
 DIST=${ROOT}/bin
 TEST=${ROOT}/test

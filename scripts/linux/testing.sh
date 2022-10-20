@@ -3,7 +3,7 @@ cd `dirname $0`
 MYDIR=`pwd`
 ${MYDIR}/buildso.sh
 ROOT=${MYDIR}/../..
-ENV=.env.36
+ENV=.env.310
 TEST=${ROOT}/test
 FILES="ut_sic.py performance.py"
 cd ${ROOT}

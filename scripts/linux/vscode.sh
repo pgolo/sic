@@ -1,7 +1,7 @@
 cd `dirname $0`
 MYDIR=`pwd`
 ROOT=${MYDIR}/../..
-ENV=.env.36
+ENV=.env.310
 cd -
 mkdir -p ${ROOT}/.vscode
 echo '{'>${ROOT}/.vscode/settings.json
